@@ -58,6 +58,9 @@ Slash commands provide meta-level control over the CLI itself.
       - **Description:** Display all directories added by `/directory add` and `--include-directories`.
       - **Usage:** `/directory show`
 
+- **`/docs`**
+  - **Description:** Open the full Gemini CLI documentation in your browser. This provides quick access to comprehensive documentation including setup guides, command references, and advanced features.
+
 - **`/editor`**
   - **Description:** Open a dialog for selecting supported editors.
 
@@ -66,6 +69,19 @@ Slash commands provide meta-level control over the CLI itself.
 
 - **`/help`** (or **`/?`**)
   - **Description:** Display help information about Gemini CLI, including available commands and their usage.
+
+- **`/ide`**
+  - **Description:** Manage IDE integration for VS Code and VS Code forks. Enables seamless connection between Gemini CLI and your IDE for enhanced development workflow.
+  - **Sub-commands:**
+    - **`status`**:
+      - **Description:** Check the current status of IDE integration and display connected IDE information. Shows open files when connected.
+    - **`enable`**:
+      - **Description:** Enable IDE integration and attempt to connect to the detected IDE.
+    - **`disable`**:
+      - **Description:** Disable IDE integration and disconnect from the current IDE.
+    - **`install`**:
+      - **Description:** Install the required IDE companion extension for your detected IDE (VS Code, Cursor, Windsurf, etc.).
+  - **Note:** IDE integration is only supported when running Gemini CLI within supported IDEs like VS Code or VS Code forks.
 
 - **`/mcp`**
   - **Description:** List configured Model Context Protocol (MCP) servers, their connection status, server details, and available tools.
@@ -91,6 +107,9 @@ Slash commands provide meta-level control over the CLI itself.
       - **Description:** Lists the paths of the GEMINI.md files in use for hierarchical memory.
     - **Note:** For more details on how `GEMINI.md` files contribute to hierarchical memory, see the [CLI Configuration documentation](../get-started/configuration.md).
 
+- **`/model`**
+  - **Description:** Open a dialog to configure the AI model settings. Allows you to change which Gemini model variant to use and adjust model-specific parameters.
+
 - **`/restore`**
   - **Description:** Restores the project files to the state they were in just before a tool was executed. This is particularly useful for undoing file edits made by a tool. If run without a tool call ID, it will list available checkpoints to restore from.
   - **Usage:** `/restore [tool_call_id]`
@@ -101,11 +120,23 @@ Slash commands provide meta-level control over the CLI itself.
   - **Details:** This command provides a user-friendly interface for changing settings that control the behavior and appearance of Gemini CLI. It is equivalent to manually editing the `.gemini/settings.json` file, but with validation and guidance to prevent errors.
   - **Usage:** Simply run `/settings` and the editor will open. You can then browse or search for specific settings, view their current values, and modify them as desired. Changes to some settings are applied immediately, while others require a restart.
 
+- **`/setup-github`**
+  - **Description:** Set up GitHub Actions workflows for automated Gemini CLI integration. Downloads workflow files for issue triage, pull request reviews, and general assistance to your repository's `.github/workflows` directory.
+  - **Features:**
+    - Downloads multiple pre-configured workflow templates
+    - Updates `.gitignore` to exclude Gemini CLI specific files
+    - Provides setup instructions and links to complete configuration
+  - **Requirements:** Must be run from within a Git repository that has a GitHub remote.
+
 - **`/stats`**
   - **Description:** Display detailed statistics for the current Gemini CLI session, including token usage, cached token savings (when available), and session duration. Note: Cached token information is only displayed when cached tokens are being used, which occurs with API key authentication but not with OAuth authentication at this time.
 
 - [**`/theme`**](./themes.md)
   - **Description:** Open a dialog that lets you change the visual theme of Gemini CLI.
+
+- **`/terminal-setup`**
+  - **Description:** Configure terminal keybindings for multiline input support in VS Code, Cursor, and Windsurf. Sets up Shift+Enter and Ctrl+Enter shortcuts for better multiline editing experience.
+  - **Note:** After running this command, you may need to restart your terminal for the changes to take effect.
 
 - **`/auth`**
   - **Description:** Open a dialog that lets you change the authentication method.
@@ -124,6 +155,9 @@ Slash commands provide meta-level control over the CLI itself.
 
 - **`/privacy`**
   - **Description:** Display the Privacy Notice and allow users to select whether they consent to the collection of their data for service improvement purposes.
+
+- **`/permissions`**
+  - **Description:** Manage folder trust settings. Opens a dialog to configure which directories are trusted for tool execution and file operations.
 
 - **`/quit`** (or **`/exit`**)
   - **Description:** Exit Gemini CLI.
