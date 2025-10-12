@@ -46,6 +46,8 @@ import { StartSessionEvent } from '../telemetry/index.js';
 import {
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_KIMI_K1_5_MODEL,
+  DEFAULT_KIMI_K2_MODEL,
 } from './models.js';
 import { shouldAttemptBrowserLaunch } from '../utils/browser.js';
 import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
@@ -1167,4 +1169,8 @@ export class Config {
   }
 }
 // Export model constants for use in CLI
-export { DEFAULT_GEMINI_FLASH_MODEL };
+export {
+  DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_KIMI_K1_5_MODEL,
+  DEFAULT_KIMI_K2_MODEL,
+};
