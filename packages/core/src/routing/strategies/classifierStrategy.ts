@@ -16,6 +16,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_MODEL,
+  DEFAULT_HUNYUAN_MODEL,
+  DEFAULT_HUNYUAN_LITE_MODEL,
 } from '../../config/models.js';
 import {
   type GenerateContentConfig,
@@ -138,12 +140,37 @@ const ClassifierResponseSchema = z.object({
   model_choice: z.enum([FLASH_MODEL, PRO_MODEL]),
 });
 
+/**
+ * Determines the appropriate fast and pro models based on the current configuration.
+ * This allows the classifier to choose models from the same family as the currently configured model.
+ */
+function getModelMappingForClassifier(config: Config): {
+  fastModel: string;
+  proModel: string;
+} {
+  const currentModel = config.getModel();
+
+  // Check if current model is from Hunyuan family
+  if (currentModel.includes('hunyuan')) {
+    return {
+      fastModel: DEFAULT_HUNYUAN_LITE_MODEL,
+      proModel: DEFAULT_HUNYUAN_MODEL,
+    };
+  }
+
+  // Default to Gemini models
+  return {
+    fastModel: DEFAULT_GEMINI_FLASH_MODEL,
+    proModel: DEFAULT_GEMINI_MODEL,
+  };
+}
+
 export class ClassifierStrategy implements RoutingStrategy {
   readonly name = 'classifier';
 
   async route(
     context: RoutingContext,
-    _config: Config,
+    config: Config,
     baseLlmClient: BaseLlmClient,
   ): Promise<RoutingDecision | null> {
     const startTime = Date.now();
@@ -184,9 +211,12 @@ export class ClassifierStrategy implements RoutingStrategy {
       const reasoning = routerResponse.reasoning;
       const latencyMs = Date.now() - startTime;
 
+      // Get appropriate models based on current configuration
+      const modelMapping = getModelMappingForClassifier(config);
+
       if (routerResponse.model_choice === FLASH_MODEL) {
         return {
-          model: DEFAULT_GEMINI_FLASH_MODEL,
+          model: modelMapping.fastModel,
           metadata: {
             source: 'Classifier',
             latencyMs,
@@ -195,7 +225,7 @@ export class ClassifierStrategy implements RoutingStrategy {
         };
       } else {
         return {
-          model: DEFAULT_GEMINI_MODEL,
+          model: modelMapping.proModel,
           metadata: {
             source: 'Classifier',
             reasoning,

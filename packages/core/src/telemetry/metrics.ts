@@ -419,6 +419,7 @@ export enum GenAiOperationName {
 export enum GenAiProviderName {
   GCP_GEN_AI = 'gcp.gen_ai',
   GCP_VERTEX_AI = 'gcp.vertex_ai',
+  TENCENT_HUNYUAN = 'tencent.hunyuan',
 }
 
 export enum GenAiTokenType {
@@ -760,6 +761,8 @@ function getGenAiProvider(authType?: string): GenAiProviderName {
     case AuthType.CLOUD_SHELL:
     case AuthType.LOGIN_WITH_GOOGLE:
       return GenAiProviderName.GCP_VERTEX_AI;
+    case AuthType.USE_HUNYUAN:
+      return GenAiProviderName.TENCENT_HUNYUAN;
     case AuthType.USE_GEMINI:
     default:
       return GenAiProviderName.GCP_GEN_AI;

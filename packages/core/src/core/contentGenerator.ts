@@ -46,6 +46,7 @@ export enum AuthType {
   USE_GEMINI = 'gemini-api-key',
   USE_VERTEX_AI = 'vertex-ai',
   CLOUD_SHELL = 'cloud-shell',
+  USE_HUNYUAN = 'hunyuan-api-key',
 }
 
 export type ContentGeneratorConfig = {
@@ -61,6 +62,7 @@ export function createContentGeneratorConfig(
 ): ContentGeneratorConfig {
   const geminiApiKey = process.env['GEMINI_API_KEY'] || undefined;
   const googleApiKey = process.env['GOOGLE_API_KEY'] || undefined;
+  const hunyuanApiKey = process.env['HUNYUAN_API_KEY'] || undefined;
   const googleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'] || undefined;
   const googleCloudLocation = process.env['GOOGLE_CLOUD_LOCATION'] || undefined;
 
@@ -79,6 +81,13 @@ export function createContentGeneratorConfig(
 
   if (authType === AuthType.USE_GEMINI && geminiApiKey) {
     contentGeneratorConfig.apiKey = geminiApiKey;
+    contentGeneratorConfig.vertexai = false;
+
+    return contentGeneratorConfig;
+  }
+
+  if (authType === AuthType.USE_HUNYUAN && hunyuanApiKey) {
+    contentGeneratorConfig.apiKey = hunyuanApiKey;
     contentGeneratorConfig.vertexai = false;
 
     return contentGeneratorConfig;

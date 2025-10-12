@@ -12,6 +12,11 @@ export const DEFAULT_GEMINI_MODEL_AUTO = 'auto';
 
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
+// Hunyuan model constants
+export const DEFAULT_HUNYUAN_MODEL = 'hunyuan-pro';
+export const DEFAULT_HUNYUAN_STANDARD_MODEL = 'hunyuan-standard';
+export const DEFAULT_HUNYUAN_LITE_MODEL = 'hunyuan-lite';
+
 // Some thinking models do not default to dynamic thinking which is done by a value of -1
 export const DEFAULT_THINKING_MODE = -1;
 
@@ -41,6 +46,11 @@ export function getEffectiveModel(
   // lite models without needing to list them all as constants.
   if (requestedModel.includes('lite')) {
     return requestedModel;
+  }
+
+  // For Hunyuan models, fallback to Hunyuan Standard instead of Gemini Flash
+  if (requestedModel.includes('hunyuan')) {
+    return DEFAULT_HUNYUAN_STANDARD_MODEL;
   }
 
   // Default fallback for Gemini CLI.

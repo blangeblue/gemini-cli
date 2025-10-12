@@ -17,6 +17,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_MODEL,
+  DEFAULT_HUNYUAN_MODEL,
+  DEFAULT_HUNYUAN_LITE_MODEL,
 } from '../../config/models.js';
 import { promptIdContext } from '../../utils/promptIdContext.js';
 import type { Content } from '@google/genai';
@@ -39,7 +41,9 @@ describe('ClassifierStrategy', () => {
       request: [{ text: 'simple task' }],
       signal: new AbortController().signal,
     };
-    mockConfig = {} as Config;
+    mockConfig = {
+      getModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL), // Default to Gemini model for existing tests
+    } as unknown as Config;
     mockBaseLlmClient = {
       generateJson: vi.fn(),
     } as unknown as BaseLlmClient;
@@ -273,5 +277,63 @@ describe('ClassifierStrategy', () => {
       ),
     );
     consoleWarnSpy.mockRestore();
+  });
+
+  it('should route to Hunyuan Lite model for a simple task when Hunyuan is configured', async () => {
+    // Configure mock to return Hunyuan model
+    vi.mocked(mockConfig.getModel).mockReturnValue(DEFAULT_HUNYUAN_MODEL);
+
+    const mockApiResponse = {
+      reasoning: 'This is a simple task.',
+      model_choice: 'flash',
+    };
+    vi.mocked(mockBaseLlmClient.generateJson).mockResolvedValue(
+      mockApiResponse,
+    );
+
+    const decision = await strategy.route(
+      mockContext,
+      mockConfig,
+      mockBaseLlmClient,
+    );
+
+    expect(mockBaseLlmClient.generateJson).toHaveBeenCalledOnce();
+    expect(decision).toEqual({
+      model: DEFAULT_HUNYUAN_LITE_MODEL,
+      metadata: {
+        source: 'Classifier',
+        latencyMs: expect.any(Number),
+        reasoning: mockApiResponse.reasoning,
+      },
+    });
+  });
+
+  it('should route to Hunyuan Pro model for a complex task when Hunyuan is configured', async () => {
+    // Configure mock to return Hunyuan model
+    vi.mocked(mockConfig.getModel).mockReturnValue(DEFAULT_HUNYUAN_MODEL);
+
+    const mockApiResponse = {
+      reasoning: 'This is a complex task.',
+      model_choice: 'pro',
+    };
+    vi.mocked(mockBaseLlmClient.generateJson).mockResolvedValue(
+      mockApiResponse,
+    );
+
+    const decision = await strategy.route(
+      mockContext,
+      mockConfig,
+      mockBaseLlmClient,
+    );
+
+    expect(mockBaseLlmClient.generateJson).toHaveBeenCalledOnce();
+    expect(decision).toEqual({
+      model: DEFAULT_HUNYUAN_MODEL,
+      metadata: {
+        source: 'Classifier',
+        latencyMs: expect.any(Number),
+        reasoning: mockApiResponse.reasoning,
+      },
+    });
   });
 });
