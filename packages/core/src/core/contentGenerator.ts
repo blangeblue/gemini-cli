@@ -41,12 +41,13 @@ export interface ContentGenerator {
   userTier?: UserTierId;
 }
 
+// 认证类型枚举，定义支持的各种AI服务认证方式
 export enum AuthType {
-  LOGIN_WITH_GOOGLE = 'oauth-personal',
-  USE_GEMINI = 'gemini-api-key',
-  USE_VERTEX_AI = 'vertex-ai',
-  CLOUD_SHELL = 'cloud-shell',
-  USE_HUNYUAN = 'hunyuan-api-key',
+  LOGIN_WITH_GOOGLE = 'oauth-personal', // 使用 Google 个人账户 OAuth 登录
+  USE_GEMINI = 'gemini-api-key', // 使用 Gemini API 密钥认证
+  USE_VERTEX_AI = 'vertex-ai', // 使用 Google Cloud Vertex AI 认证
+  CLOUD_SHELL = 'cloud-shell', // 在 Google Cloud Shell 环境中使用
+  USE_HUNYUAN = 'hunyuan-api-key', // 使用腾讯混元 API 密钥认证
 }
 
 export type ContentGeneratorConfig = {
@@ -57,40 +58,44 @@ export type ContentGeneratorConfig = {
 };
 
 export function createContentGeneratorConfig(
-  config: Config,
-  authType: AuthType | undefined,
+  config: Config, // 应用程序配置对象
+  authType: AuthType | undefined, // 认证类型，可能未定义
 ): ContentGeneratorConfig {
-  const geminiApiKey = process.env['GEMINI_API_KEY'] || undefined;
-  const googleApiKey = process.env['GOOGLE_API_KEY'] || undefined;
-  const hunyuanApiKey = process.env['HUNYUAN_API_KEY'] || undefined;
-  const googleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'] || undefined;
-  const googleCloudLocation = process.env['GOOGLE_CLOUD_LOCATION'] || undefined;
+  // 从环境变量中获取各种 API 密钥
+  const geminiApiKey = process.env['GEMINI_API_KEY'] || undefined; // Gemini API 密钥
+  const googleApiKey = process.env['GOOGLE_API_KEY'] || undefined; // Google API 密钥
+  const hunyuanApiKey = process.env['HUNYUAN_API_KEY'] || undefined; // 混元 API 密钥（新增支持）
+  const googleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'] || undefined; // Google Cloud 项目 ID
+  const googleCloudLocation = process.env['GOOGLE_CLOUD_LOCATION'] || undefined; // Google Cloud 位置
 
+  // 创建内容生成器配置对象
   const contentGeneratorConfig: ContentGeneratorConfig = {
-    authType,
-    proxy: config?.getProxy(),
+    authType, // 设置认证类型
+    proxy: config?.getProxy(), // 设置代理配置（如果存在）
   };
 
-  // If we are using Google auth or we are in Cloud Shell, there is nothing else to validate for now
+  // 如果使用 Google 认证或在 Cloud Shell 中，目前不需要验证其他内容
   if (
-    authType === AuthType.LOGIN_WITH_GOOGLE ||
-    authType === AuthType.CLOUD_SHELL
+    authType === AuthType.LOGIN_WITH_GOOGLE || // Google OAuth 登录
+    authType === AuthType.CLOUD_SHELL // Cloud Shell 环境
   ) {
-    return contentGeneratorConfig;
+    return contentGeneratorConfig; // 直接返回基础配置
   }
 
+  // 处理 Gemini API 密钥认证
   if (authType === AuthType.USE_GEMINI && geminiApiKey) {
-    contentGeneratorConfig.apiKey = geminiApiKey;
-    contentGeneratorConfig.vertexai = false;
+    contentGeneratorConfig.apiKey = geminiApiKey; // 设置 Gemini API 密钥
+    contentGeneratorConfig.vertexai = false; // 不使用 Vertex AI
 
-    return contentGeneratorConfig;
+    return contentGeneratorConfig; // 返回 Gemini 配置
   }
 
+  // 处理混元 API 密钥认证（新增功能）
   if (authType === AuthType.USE_HUNYUAN && hunyuanApiKey) {
-    contentGeneratorConfig.apiKey = hunyuanApiKey;
-    contentGeneratorConfig.vertexai = false;
+    contentGeneratorConfig.apiKey = hunyuanApiKey; // 设置混元 API 密钥
+    contentGeneratorConfig.vertexai = false; // 不使用 Vertex AI
 
-    return contentGeneratorConfig;
+    return contentGeneratorConfig; // 返回混元配置
   }
 
   if (
