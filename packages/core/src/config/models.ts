@@ -12,6 +12,14 @@ export const DEFAULT_GEMINI_MODEL_AUTO = 'auto';
 
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
+// Qwen model constants for Vertex AI
+export const DEFAULT_QWEN_NEXT_80B_INSTRUCT_MODEL =
+  'qwen3-next-80b-a3b-instruct-maas';
+export const DEFAULT_QWEN_NEXT_80B_THINKING_MODEL =
+  'qwen3-next-80b-a3b-thinking-maas';
+export const DEFAULT_QWEN_CODER_MODEL = 'qwen3-coder';
+export const DEFAULT_QWEN_235B_MODEL = 'qwen3-235b';
+
 // Some thinking models do not default to dynamic thinking which is done by a value of -1
 export const DEFAULT_THINKING_MODE = -1;
 

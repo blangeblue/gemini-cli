@@ -26,6 +26,14 @@ export function tokenLimit(model: Model): TokenCount {
       return 1_048_576;
     case 'gemini-2.0-flash-preview-image-generation':
       return 32_000;
+    // Qwen models token limits
+    case 'qwen3-next-80b-a3b-instruct-maas':
+    case 'qwen3-next-80b-a3b-thinking-maas':
+      return 262_144; // 262.1K tokens
+    case 'qwen3-coder':
+      return 1_000_000; // 1M tokens
+    case 'qwen3-235b':
+      return 262_144; // Similar to other Qwen models, may be adjusted based on specs
     default:
       return DEFAULT_TOKEN_LIMIT;
   }
