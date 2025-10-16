@@ -149,5 +149,145 @@ export const memoryCommand: SlashCommand = {
         );
       },
     },
+    {
+      name: 'search',
+      description: 'Search for specific content in memory.',
+      kind: CommandKind.BUILT_IN,
+      action: async (
+        context,
+        args,
+      ): Promise<SlashCommandActionReturn | void> => {
+        if (!args || args.trim() === '') {
+          return {
+            type: 'message',
+            messageType: 'error',
+            content: 'Usage: /memory search <search term>',
+          };
+        }
+
+        const memoryContent = context.services.config?.getUserMemory() || '';
+        const searchTerm = args.trim().toLowerCase();
+
+        if (memoryContent.length === 0) {
+          context.ui.addItem(
+            {
+              type: MessageType.INFO,
+              text: 'Memory is currently empty. Nothing to search.',
+            },
+            Date.now(),
+          );
+          return;
+        }
+
+        const lines = memoryContent.split('\n');
+        const matchingLines: string[] = [];
+        let lineNumber = 1;
+
+        for (const line of lines) {
+          if (line.toLowerCase().includes(searchTerm)) {
+            matchingLines.push(`Line ${lineNumber}: ${line.trim()}`);
+          }
+          lineNumber++;
+        }
+
+        const messageContent =
+          matchingLines.length > 0
+            ? `Found ${matchingLines.length} match(es) for "${args.trim()}":\n\n${matchingLines.join('\n')}`
+            : `No matches found for "${args.trim()}" in memory.`;
+
+        context.ui.addItem(
+          {
+            type: MessageType.INFO,
+            text: messageContent,
+          },
+          Date.now(),
+        );
+      },
+    },
+    {
+      name: 'clear',
+      description: 'Clear all memory content (requires confirmation).',
+      kind: CommandKind.BUILT_IN,
+      action: (context, args): SlashCommandActionReturn | void => {
+        if (args && args.trim() === '--force') {
+          return {
+            type: 'tool',
+            toolName: 'clear_memory',
+            toolArgs: { force: true },
+          };
+        }
+
+        context.ui.addItem(
+          {
+            type: MessageType.INFO,
+            text: 'This will permanently delete all memory content. Use "/memory clear --force" to confirm.',
+          },
+          Date.now(),
+        );
+      },
+    },
+    {
+      name: 'stats',
+      description: 'Show memory usage statistics.',
+      kind: CommandKind.BUILT_IN,
+      action: async (context) => {
+        const memoryContent = context.services.config?.getUserMemory() || '';
+        const fileCount = context.services.config?.getGeminiMdFileCount() || 0;
+        const filePaths = context.services.config?.getGeminiMdFilePaths() || [];
+
+        if (memoryContent.length === 0) {
+          context.ui.addItem(
+            {
+              type: MessageType.INFO,
+              text: 'Memory is currently empty.',
+            },
+            Date.now(),
+          );
+          return;
+        }
+
+        const lines = memoryContent.split('\n');
+        const nonEmptyLines = lines.filter((line) => line.trim().length > 0);
+        const memoryItems = nonEmptyLines.filter((line) =>
+          line.trim().startsWith('- '),
+        );
+        const wordCount = memoryContent
+          .split(/\s+/)
+          .filter((word) => word.length > 0).length;
+
+        const stats = [
+          `Memory Statistics:`,
+          `├─ Total characters: ${memoryContent.length}`,
+          `├─ Total lines: ${lines.length}`,
+          `├─ Non-empty lines: ${nonEmptyLines.length}`,
+          `├─ Memory items: ${memoryItems.length}`,
+          `├─ Word count: ${wordCount}`,
+          `├─ Files in use: ${fileCount}`,
+          `└─ File paths: ${filePaths.length > 0 ? '\n   ' + filePaths.join('\n   ') : 'None'}`,
+        ].join('\n');
+
+        context.ui.addItem(
+          {
+            type: MessageType.INFO,
+            text: stats,
+          },
+          Date.now(),
+        );
+      },
+    },
+    {
+      name: 'export',
+      description: 'Export memory content to a file.',
+      kind: CommandKind.BUILT_IN,
+      action: (context, args): SlashCommandActionReturn | void => {
+        const fileName = args?.trim() || 'memory-export.md';
+
+        return {
+          type: 'tool',
+          toolName: 'export_memory',
+          toolArgs: { fileName },
+        };
+      },
+    },
   ],
 };

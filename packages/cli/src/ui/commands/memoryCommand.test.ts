@@ -37,7 +37,15 @@ describe('memoryCommand', () => {
   let mockContext: CommandContext;
 
   const getSubCommand = (
-    name: 'show' | 'add' | 'refresh' | 'list',
+    name:
+      | 'show'
+      | 'add'
+      | 'refresh'
+      | 'list'
+      | 'search'
+      | 'clear'
+      | 'stats'
+      | 'export',
   ): SlashCommand => {
     const subCommand = memoryCommand.subCommands?.find(
       (cmd) => cmd.name === name,
@@ -349,6 +357,151 @@ describe('memoryCommand', () => {
         },
         expect.any(Number),
       );
+    });
+  });
+
+  describe('/memory search', () => {
+    let searchCommand: SlashCommand;
+    let mockGetUserMemory: Mock;
+
+    beforeEach(() => {
+      searchCommand = getSubCommand('search');
+      mockGetUserMemory = vi.fn();
+      mockContext = createMockCommandContext({
+        services: {
+          config: {
+            getUserMemory: mockGetUserMemory,
+          },
+        },
+      });
+    });
+
+    it('should return error message when no search term is provided', async () => {
+      if (!searchCommand.action) throw new Error('Command has no action');
+
+      const result = await searchCommand.action(mockContext, '');
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content: 'Usage: /memory search <search term>',
+      });
+    });
+
+    it('should handle empty memory when searching', async () => {
+      if (!searchCommand.action) throw new Error('Command has no action');
+
+      mockGetUserMemory.mockReturnValue('');
+      await searchCommand.action(mockContext, 'test');
+
+      expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+        {
+          type: MessageType.INFO,
+          text: 'Memory is currently empty. Nothing to search.',
+        },
+        expect.any(Number),
+      );
+    });
+
+    it('should find matches in memory content', async () => {
+      if (!searchCommand.action) throw new Error('Command has no action');
+
+      const memoryContent = 'favorite color is blue\nnothing here\nblue again';
+      mockGetUserMemory.mockReturnValue(memoryContent);
+
+      await searchCommand.action(mockContext, 'blue');
+
+      expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+        {
+          type: MessageType.INFO,
+          text: 'Found 2 match(es) for "blue":\n\nLine 1: favorite color is blue\nLine 3: blue again',
+        },
+        expect.any(Number),
+      );
+    });
+
+    it('should handle no matches found', async () => {
+      if (!searchCommand.action) throw new Error('Command has no action');
+
+      const memoryContent = 'Some memory content without the search term';
+      mockGetUserMemory.mockReturnValue(memoryContent);
+
+      await searchCommand.action(mockContext, 'xyz');
+
+      expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+        {
+          type: MessageType.INFO,
+          text: 'No matches found for "xyz" in memory.',
+        },
+        expect.any(Number),
+      );
+    });
+  });
+
+  describe('/memory clear', () => {
+    let clearCommand: SlashCommand;
+
+    beforeEach(() => {
+      clearCommand = getSubCommand('clear');
+      mockContext = createMockCommandContext();
+    });
+
+    it('should show confirmation message without --force flag', async () => {
+      if (!clearCommand.action) throw new Error('Command has no action');
+
+      await clearCommand.action(mockContext, '');
+
+      expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+        {
+          type: MessageType.INFO,
+          text: 'This will permanently delete all memory content. Use "/memory clear --force" to confirm.',
+        },
+        expect.any(Number),
+      );
+    });
+
+    it('should return tool action with --force flag', async () => {
+      if (!clearCommand.action) throw new Error('Command has no action');
+
+      const result = await clearCommand.action(mockContext, '--force');
+
+      expect(result).toEqual({
+        type: 'tool',
+        toolName: 'clear_memory',
+        toolArgs: { force: true },
+      });
+    });
+  });
+
+  describe('/memory export', () => {
+    let exportCommand: SlashCommand;
+
+    beforeEach(() => {
+      exportCommand = getSubCommand('export');
+      mockContext = createMockCommandContext();
+    });
+
+    it('should return tool action with default filename', async () => {
+      if (!exportCommand.action) throw new Error('Command has no action');
+
+      const result = await exportCommand.action(mockContext, '');
+
+      expect(result).toEqual({
+        type: 'tool',
+        toolName: 'export_memory',
+        toolArgs: { fileName: 'memory-export.md' },
+      });
+    });
+
+    it('should return tool action with custom filename', async () => {
+      if (!exportCommand.action) throw new Error('Command has no action');
+
+      const result = await exportCommand.action(mockContext, 'my-backup.md');
+
+      expect(result).toEqual({
+        type: 'tool',
+        toolName: 'export_memory',
+        toolArgs: { fileName: 'my-backup.md' },
+      });
     });
   });
 });
