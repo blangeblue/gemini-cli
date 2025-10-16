@@ -7,6 +7,7 @@
 import {
   getErrorMessage,
   loadServerHierarchicalMemory,
+  SessionHistoryTool,
 } from '@google/gemini-cli-core';
 import { MessageType } from '../types.js';
 import type { SlashCommand, SlashCommandActionReturn } from './types.js';
@@ -148,6 +149,188 @@ export const memoryCommand: SlashCommand = {
           Date.now(),
         );
       },
+    },
+    {
+      name: 'session',
+      description: 'Commands for managing session history.',
+      kind: CommandKind.BUILT_IN,
+      subCommands: [
+        {
+          name: 'save',
+          description: 'Save current session summary to long-term memory.',
+          kind: CommandKind.BUILT_IN,
+          action: (context, args): SlashCommandActionReturn | void => {
+            if (!args || args.trim() === '') {
+              return {
+                type: 'message',
+                messageType: 'error',
+                content: 'Usage: /memory session save <session summary>',
+              };
+            }
+
+            context.ui.addItem(
+              {
+                type: MessageType.INFO,
+                text: `Attempting to save session summary: "${args.trim()}"`,
+              },
+              Date.now(),
+            );
+
+            return {
+              type: 'tool',
+              toolName: 'save_session_history',
+              toolArgs: { sessionSummary: args.trim() },
+            };
+          },
+        },
+        {
+          name: 'list',
+          description: 'List recent session history entries.',
+          kind: CommandKind.BUILT_IN,
+          action: async (context, args): Promise<void> => {
+            try {
+              const limit = args ? parseInt(args.trim(), 10) || 10 : 10;
+              const history = await SessionHistoryTool.getSessionHistory(
+                undefined,
+                limit,
+              );
+
+              if (history.length === 0) {
+                context.ui.addItem(
+                  {
+                    type: MessageType.INFO,
+                    text: 'No session history found.',
+                  },
+                  Date.now(),
+                );
+                return;
+              }
+
+              const historyText = history
+                .map(
+                  (entry, index) =>
+                    `${index + 1}. [${entry.category}] ${new Date(entry.timestamp).toLocaleString()}\n   ${entry.summary.substring(0, 200)}${entry.summary.length > 200 ? '...' : ''}`,
+                )
+                .join('\n\n');
+
+              context.ui.addItem(
+                {
+                  type: MessageType.INFO,
+                  text: `Recent Session History (${history.length} entries):\n\n${historyText}`,
+                },
+                Date.now(),
+              );
+            } catch (error) {
+              const errorMessage = getErrorMessage(error);
+              context.ui.addItem(
+                {
+                  type: MessageType.ERROR,
+                  text: `Error retrieving session history: ${errorMessage}`,
+                },
+                Date.now(),
+              );
+            }
+          },
+        },
+        {
+          name: 'categories',
+          description: 'List available session history categories.',
+          kind: CommandKind.BUILT_IN,
+          action: async (context): Promise<void> => {
+            try {
+              const categories = await SessionHistoryTool.getCategories();
+
+              if (categories.length === 0) {
+                context.ui.addItem(
+                  {
+                    type: MessageType.INFO,
+                    text: 'No session history categories found.',
+                  },
+                  Date.now(),
+                );
+                return;
+              }
+
+              context.ui.addItem(
+                {
+                  type: MessageType.INFO,
+                  text: `Available Categories:\n\n${categories.map((cat) => `- ${cat}`).join('\n')}`,
+                },
+                Date.now(),
+              );
+            } catch (error) {
+              const errorMessage = getErrorMessage(error);
+              context.ui.addItem(
+                {
+                  type: MessageType.ERROR,
+                  text: `Error retrieving categories: ${errorMessage}`,
+                },
+                Date.now(),
+              );
+            }
+          },
+        },
+        {
+          name: 'search',
+          description: 'Search session history by category.',
+          kind: CommandKind.BUILT_IN,
+          action: async (
+            context,
+            args,
+          ): Promise<SlashCommandActionReturn | void> => {
+            if (!args || args.trim() === '') {
+              return {
+                type: 'message',
+                messageType: 'error',
+                content: 'Usage: /memory session search <category>',
+              };
+            }
+
+            try {
+              const category = args.trim();
+              const history = await SessionHistoryTool.getSessionHistory(
+                category,
+                20,
+              );
+
+              if (history.length === 0) {
+                context.ui.addItem(
+                  {
+                    type: MessageType.INFO,
+                    text: `No session history found for category: ${category}`,
+                  },
+                  Date.now(),
+                );
+                return;
+              }
+
+              const historyText = history
+                .map(
+                  (entry, index) =>
+                    `${index + 1}. ${new Date(entry.timestamp).toLocaleString()}\n   ${entry.summary.substring(0, 200)}${entry.summary.length > 200 ? '...' : ''}`,
+                )
+                .join('\n\n');
+
+              context.ui.addItem(
+                {
+                  type: MessageType.INFO,
+                  text: `Session History for "${category}" (${history.length} entries):\n\n${historyText}`,
+                },
+                Date.now(),
+              );
+            } catch (error) {
+              const errorMessage = getErrorMessage(error);
+              context.ui.addItem(
+                {
+                  type: MessageType.ERROR,
+                  text: `Error searching session history: ${errorMessage}`,
+                },
+                Date.now(),
+              );
+            }
+          },
+        },
+      ],
     },
   ],
 };

@@ -29,6 +29,7 @@ import { WriteFileTool } from '../tools/write-file.js';
 import { WebFetchTool } from '../tools/web-fetch.js';
 import { ReadManyFilesTool } from '../tools/read-many-files.js';
 import { MemoryTool, setGeminiMdFilename } from '../tools/memoryTool.js';
+import { SessionHistoryTool } from '../tools/sessionHistoryTool.js';
 import { WebSearchTool } from '../tools/web-search.js';
 import { GeminiClient } from '../core/client.js';
 import { BaseLlmClient } from '../core/baseLlmClient.js';
@@ -1122,6 +1123,7 @@ export class Config {
     registerCoreTool(ReadManyFilesTool, this);
     registerCoreTool(ShellTool, this);
     registerCoreTool(MemoryTool);
+    registerCoreTool(SessionHistoryTool);
     registerCoreTool(WebSearchTool, this);
     if (this.getUseWriteTodos()) {
       registerCoreTool(WriteTodosTool, this);
