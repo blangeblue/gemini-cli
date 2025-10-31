@@ -11,6 +11,7 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_MODEL_AUTO,
+  DEFAULT_HUNYUAN_MODEL,
 } from '@google/gemini-cli-core';
 import { ModelDialog } from './ModelDialog.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -93,11 +94,12 @@ describe('<ModelDialog />', () => {
     expect(mockedSelect).toHaveBeenCalledTimes(1);
 
     const props = mockedSelect.mock.calls[0][0];
-    expect(props.items).toHaveLength(4);
+    expect(props.items).toHaveLength(5);
     expect(props.items[0].value).toBe(DEFAULT_GEMINI_MODEL_AUTO);
     expect(props.items[1].value).toBe(DEFAULT_GEMINI_MODEL);
     expect(props.items[2].value).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     expect(props.items[3].value).toBe(DEFAULT_GEMINI_FLASH_LITE_MODEL);
+    expect(props.items[4].value).toBe(DEFAULT_HUNYUAN_MODEL);
     expect(props.showNumbers).toBe(true);
   });
 
@@ -219,5 +221,15 @@ describe('<ModelDialog />', () => {
     // Should be called at least twice: initial render + re-render after context change
     expect(mockedSelect).toHaveBeenCalledTimes(2);
     expect(mockedSelect.mock.calls[1][0].initialIndex).toBe(3);
+  });
+
+  it('includes Hunyuan model in the options', () => {
+    renderComponent();
+    const props = mockedSelect.mock.calls[0][0];
+    const hunyuanOption = props.items.find(
+      (item: { value: unknown }) => item.value === DEFAULT_HUNYUAN_MODEL,
+    );
+    expect(hunyuanOption).toBeDefined();
+    expect(hunyuanOption?.title).toContain('Hunyuan');
   });
 });
