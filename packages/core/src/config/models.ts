@@ -12,6 +12,11 @@ export const DEFAULT_GEMINI_MODEL_AUTO = 'auto';
 
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
+// Hunyuan model constants
+export const DEFAULT_HUNYUAN_MODEL = 'hunyuan-turbos-latest';
+export const DEFAULT_HUNYUAN_LITE_MODEL = 'hunyuan-lite';
+export const DEFAULT_HUNYUAN_VISION_MODEL = 'hunyuan-vision';
+
 // Some thinking models do not default to dynamic thinking which is done by a value of -1
 export const DEFAULT_THINKING_MODE = -1;
 

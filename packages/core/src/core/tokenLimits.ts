@@ -26,6 +26,11 @@ export function tokenLimit(model: Model): TokenCount {
       return 1_048_576;
     case 'gemini-2.0-flash-preview-image-generation':
       return 32_000;
+    // Hunyuan models support up to 256K tokens
+    case 'hunyuan-turbos-latest':
+    case 'hunyuan-lite':
+    case 'hunyuan-vision':
+      return 256_000;
     default:
       return DEFAULT_TOKEN_LIMIT;
   }
