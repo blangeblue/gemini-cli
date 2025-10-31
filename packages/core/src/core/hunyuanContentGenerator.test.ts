@@ -11,14 +11,14 @@ import type { GenerateContentParameters } from '@google/genai';
 // Mock the OpenAI module
 const mockCreate = vi.fn();
 vi.mock('openai', () => ({
-    default: class MockOpenAI {
-      chat = {
-        completions: {
-          create: mockCreate,
-        },
-      };
-    },
-  }));
+  default: class MockOpenAI {
+    chat = {
+      completions: {
+        create: mockCreate,
+      },
+    };
+  },
+}));
 
 describe('HunyuanContentGenerator', () => {
   let generator: HunyuanContentGenerator;
@@ -55,10 +55,8 @@ describe('HunyuanContentGenerator', () => {
       const result = await generator.generateContent(request, 'test-prompt-id');
 
       expect(result.candidates).toBeDefined();
-      expect(result.candidates?.[0]?.content.parts?.[0]).toHaveProperty(
-        'text',
-        'Hello, world!',
-      );
+      expect(result.candidates).toHaveLength(1);
+      expect(result.text).toBe('Hello, world!');
       expect(result.usageMetadata).toEqual({
         promptTokenCount: 10,
         candidatesTokenCount: 5,
@@ -179,14 +177,8 @@ describe('HunyuanContentGenerator', () => {
       }
 
       expect(responses).toHaveLength(2);
-      expect(responses[0].candidates?.[0]?.content.parts?.[0]).toHaveProperty(
-        'text',
-        'Hello',
-      );
-      expect(responses[1].candidates?.[0]?.content.parts?.[0]).toHaveProperty(
-        'text',
-        'Hello world',
-      );
+      expect(responses[0].text).toBe('Hello');
+      expect(responses[1].text).toBe('Hello world');
     });
   });
 

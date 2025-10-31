@@ -84,13 +84,14 @@ export class HunyuanContentGenerator implements ContentGenerator {
       const delta = chunk.choices[0]?.delta;
       if (delta?.content) {
         accumulatedText += delta.content;
-        candidatesTokenCount += 1; // Approximate token count
       }
 
-      // Track usage if provided
+      // Track usage if provided by the API
+      // Note: Not all streaming chunks include usage metadata
       if (chunk.usage) {
         totalTokens = chunk.usage.total_tokens || 0;
         promptTokens = chunk.usage.prompt_tokens || 0;
+        candidatesTokenCount = chunk.usage.completion_tokens || 0;
       }
 
       const usageMetadata: GenerateContentResponseUsageMetadata = {
@@ -107,12 +108,19 @@ export class HunyuanContentGenerator implements ContentGenerator {
     }
   }
 
+  /**
+   * Count tokens for a given request.
+   *
+   * Note: Hunyuan API does not provide a direct token counting endpoint.
+   * This method returns 0 as a placeholder. For accurate token counting,
+   * users should monitor the usageMetadata in actual API responses.
+   */
   async countTokens(
     _request: CountTokensParameters,
   ): Promise<CountTokensResponse> {
     // Hunyuan doesn't provide a direct token counting API
-    // Return a rough estimate based on text length
-    // This is a simplified implementation
+    // Return 0 to indicate counting is not available
+    // Users should rely on usageMetadata from actual API responses
     return {
       totalTokens: 0,
     };
@@ -177,34 +185,29 @@ export class HunyuanContentGenerator implements ContentGenerator {
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
 
     for (const content of contentsArray) {
-      if (content.role === 'user') {
-        const textParts = content.parts
-          ?.filter((p): p is Part & { text: string } => 'text' in p && !!p.text)
-          .map((p) => p.text)
-          .join('\n');
-
-        if (textParts) {
-          messages.push({
-            role: 'user',
-            content: textParts,
-          });
-        }
-      } else if (content.role === 'model') {
-        const textParts = content.parts
-          ?.filter((p): p is Part & { text: string } => 'text' in p && !!p.text)
-          .map((p) => p.text)
-          .join('\n');
-
-        if (textParts) {
-          messages.push({
-            role: 'assistant',
-            content: textParts,
-          });
-        }
+      const textContent = this.extractTextFromParts(content.parts);
+      if (textContent) {
+        const role = content.role === 'model' ? 'assistant' : 'user';
+        messages.push({
+          role,
+          content: textContent,
+        });
       }
     }
 
     return messages;
+  }
+
+  /**
+   * Extracts and concatenates text from an array of parts.
+   */
+  private extractTextFromParts(parts?: Part[]): string {
+    return (
+      parts
+        ?.filter((p): p is Part & { text: string } => 'text' in p && !!p.text)
+        .map((p) => p.text)
+        .join('\n') || ''
+    );
   }
 
   private convertFromOpenAIResponse(
