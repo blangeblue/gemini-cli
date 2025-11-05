@@ -89,6 +89,14 @@ Slash commands provide meta-level control over the CLI itself.
       - **Description:** Reload the hierarchical instructional memory from all `GEMINI.md` files found in the configured locations (global, project/ancestors, and sub-directories). This command updates the model with the latest `GEMINI.md` content.
     - **`list`**:
       - **Description:** Lists the paths of the GEMINI.md files in use for hierarchical memory.
+    - **`search`**:
+      - **Description:** Search for specific content in memory. Usage: `/memory search <search term>`
+    - **`clear`**:
+      - **Description:** Clear all memory content (requires confirmation). Usage: `/memory clear --force` to skip confirmation.
+    - **`stats`**:
+      - **Description:** Show memory usage statistics including character count, line count, word count, and file information.
+    - **`export`**:
+      - **Description:** Export memory content to a file for backup. Usage: `/memory export [filename]` (defaults to memory-export.md).
     - **Note:** For more details on how `GEMINI.md` files contribute to hierarchical memory, see the [CLI Configuration documentation](../get-started/configuration.md).
 
 - **`/restore`**
