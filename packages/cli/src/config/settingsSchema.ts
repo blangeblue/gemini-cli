@@ -1020,6 +1020,16 @@ const SETTINGS_SCHEMA = {
         description: 'Configuration for the bug report command.',
         showInDialog: false,
       },
+      startupCommands: {
+        type: 'array',
+        label: 'Startup Commands',
+        category: 'Advanced',
+        requiresRestart: false,
+        default: [] as string[],
+        description: 'Commands to execute when the CLI starts up.',
+        showInDialog: false,
+        mergeStrategy: MergeStrategy.CONCAT,
+      },
     },
   },
 

@@ -13,6 +13,7 @@ import { readStdin } from './utils/readStdin.js';
 import { basename } from 'node:path';
 import v8 from 'node:v8';
 import os from 'node:os';
+import { execSync } from 'node:child_process';
 import dns from 'node:dns';
 import { start_sandbox } from './utils/sandbox.js';
 import type { DnsResolutionOrder, LoadedSettings } from './config/settings.js';
@@ -113,6 +114,44 @@ function getNodeMemoryArgs(isDebugMode: boolean): string[] {
   }
 
   return [];
+}
+
+async function executeStartupCommands(
+  commands: string[],
+  isDebugMode: boolean,
+): Promise<void> {
+  if (!commands.length) {
+    return;
+  }
+
+  if (isDebugMode) {
+    console.debug(`Executing ${commands.length} startup command(s)...`);
+  }
+
+  for (const command of commands) {
+    try {
+      if (isDebugMode) {
+        console.debug(`Executing startup command: ${command}`);
+      }
+
+      execSync(command, {
+        stdio: isDebugMode ? 'inherit' : 'ignore',
+        encoding: 'utf8',
+        timeout: 30000, // 30 second timeout
+        cwd: process.cwd(),
+      });
+
+      if (isDebugMode) {
+        console.debug(`Startup command completed: ${command}`);
+      }
+    } catch (error) {
+      console.warn(`Startup command failed: ${command}`);
+      if (isDebugMode) {
+        console.debug(`Error details:`, error);
+      }
+      // Continue with other commands even if one fails
+    }
+  }
 }
 
 export function setupUnhandledRejectionHandler() {
@@ -249,6 +288,29 @@ export async function main() {
       // The useThemeCommand hook in AppContainer.tsx will handle opening the dialog.
       console.warn(`Warning: Theme "${settings.merged.ui?.theme}" not found.`);
     }
+  }
+
+  if (isDebugMode) {
+    console.debug('About to check for startup commands...');
+    console.debug(
+      'settings.merged.advanced:',
+      JSON.stringify(settings.merged.advanced, null, 2),
+    );
+  }
+
+  // Execute startup commands if configured
+  if (settings.merged.advanced?.startupCommands?.length) {
+    if (isDebugMode) {
+      console.debug(
+        `Found ${settings.merged.advanced.startupCommands.length} startup commands to execute`,
+      );
+    }
+    await executeStartupCommands(
+      settings.merged.advanced.startupCommands,
+      isDebugMode,
+    );
+  } else if (isDebugMode) {
+    console.debug('No startup commands configured');
   }
 
   // hop into sandbox if we are outside and sandboxing is enabled
