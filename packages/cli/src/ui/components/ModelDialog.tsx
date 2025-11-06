@@ -12,6 +12,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_MODEL_AUTO,
+  DEFAULT_KIMI_K1_5_MODEL,
+  DEFAULT_KIMI_K2_MODEL,
   ModelSlashCommandEvent,
   logModelSlashCommand,
 } from '@google/gemini-cli-core';
@@ -48,6 +50,18 @@ const MODEL_OPTIONS = [
     title: 'Flash-Lite',
     description: 'For simple tasks that need to be done quickly',
     key: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  },
+  {
+    value: DEFAULT_KIMI_K2_MODEL,
+    title: 'Kimi K2',
+    description: 'Advanced AI model with superior reasoning capabilities',
+    key: DEFAULT_KIMI_K2_MODEL,
+  },
+  {
+    value: DEFAULT_KIMI_K1_5_MODEL,
+    title: 'Kimi K1.5',
+    description: 'Multimodal model with strong performance at lower cost',
+    key: DEFAULT_KIMI_K1_5_MODEL,
   },
 ];
 

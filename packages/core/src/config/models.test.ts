@@ -10,6 +10,8 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  DEFAULT_KIMI_K1_5_MODEL,
+  DEFAULT_KIMI_K2_MODEL,
 } from './models.js';
 
 describe('getEffectiveModel', () => {
@@ -35,6 +37,19 @@ describe('getEffectiveModel', () => {
         DEFAULT_GEMINI_FLASH_LITE_MODEL,
       );
       expect(model).toBe(DEFAULT_GEMINI_FLASH_LITE_MODEL);
+    });
+
+    it('should return Kimi K2 model when requested', () => {
+      const model = getEffectiveModel(isInFallbackMode, DEFAULT_KIMI_K2_MODEL);
+      expect(model).toBe(DEFAULT_KIMI_K2_MODEL);
+    });
+
+    it('should return Kimi K1.5 model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_KIMI_K1_5_MODEL,
+      );
+      expect(model).toBe(DEFAULT_KIMI_K1_5_MODEL);
     });
 
     it('should return a custom model name when requested', () => {
@@ -72,6 +87,19 @@ describe('getEffectiveModel', () => {
       const customLiteModel = 'gemini-2.5-custom-lite-vNext';
       const model = getEffectiveModel(isInFallbackMode, customLiteModel);
       expect(model).toBe(customLiteModel);
+    });
+
+    it('should downgrade Kimi K2 model to Flash model', () => {
+      const model = getEffectiveModel(isInFallbackMode, DEFAULT_KIMI_K2_MODEL);
+      expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+    });
+
+    it('should downgrade Kimi K1.5 model to Flash model', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_KIMI_K1_5_MODEL,
+      );
+      expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     });
 
     it('should downgrade any other custom model to the Flash model', () => {

@@ -12,6 +12,10 @@ export const DEFAULT_GEMINI_MODEL_AUTO = 'auto';
 
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
+// Kimi models (Moonshot AI)
+export const DEFAULT_KIMI_K1_5_MODEL = 'kimi-k1.5';
+export const DEFAULT_KIMI_K2_MODEL = 'kimi-k2';
+
 // Some thinking models do not default to dynamic thinking which is done by a value of -1
 export const DEFAULT_THINKING_MODE = -1;
 
