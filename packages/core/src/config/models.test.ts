@@ -10,6 +10,10 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  DEFAULT_QWEN_NEXT_80B_INSTRUCT_MODEL,
+  DEFAULT_QWEN_NEXT_80B_THINKING_MODEL,
+  DEFAULT_QWEN_CODER_MODEL,
+  DEFAULT_QWEN_235B_MODEL,
 } from './models.js';
 
 describe('getEffectiveModel', () => {
@@ -41,6 +45,38 @@ describe('getEffectiveModel', () => {
       const customModel = 'custom-model-v1';
       const model = getEffectiveModel(isInFallbackMode, customModel);
       expect(model).toBe(customModel);
+    });
+
+    it('should return Qwen Instruct model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_QWEN_NEXT_80B_INSTRUCT_MODEL,
+      );
+      expect(model).toBe(DEFAULT_QWEN_NEXT_80B_INSTRUCT_MODEL);
+    });
+
+    it('should return Qwen Thinking model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_QWEN_NEXT_80B_THINKING_MODEL,
+      );
+      expect(model).toBe(DEFAULT_QWEN_NEXT_80B_THINKING_MODEL);
+    });
+
+    it('should return Qwen Coder model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_QWEN_CODER_MODEL,
+      );
+      expect(model).toBe(DEFAULT_QWEN_CODER_MODEL);
+    });
+
+    it('should return Qwen 235B model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_QWEN_235B_MODEL,
+      );
+      expect(model).toBe(DEFAULT_QWEN_235B_MODEL);
     });
   });
 
@@ -77,6 +113,18 @@ describe('getEffectiveModel', () => {
     it('should downgrade any other custom model to the Flash model', () => {
       const customModel = 'custom-model-v1-unlisted';
       const model = getEffectiveModel(isInFallbackMode, customModel);
+      expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+    });
+
+    it('should downgrade Qwen models to Flash model in fallback mode', () => {
+      const qwenModel = DEFAULT_QWEN_NEXT_80B_INSTRUCT_MODEL;
+      const model = getEffectiveModel(isInFallbackMode, qwenModel);
+      expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+    });
+
+    it('should downgrade Qwen Coder model to Flash model in fallback mode', () => {
+      const qwenCoderModel = DEFAULT_QWEN_CODER_MODEL;
+      const model = getEffectiveModel(isInFallbackMode, qwenCoderModel);
       expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     });
   });
