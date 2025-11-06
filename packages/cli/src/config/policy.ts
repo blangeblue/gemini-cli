@@ -19,6 +19,7 @@ import {
   // Write tools
   EditTool,
   MemoryTool,
+  SessionHistoryTool,
   ShellTool,
   WRITE_FILE_TOOL_NAME,
   WebFetchTool,
@@ -47,6 +48,7 @@ const READ_ONLY_TOOLS = new Set([
 const WRITE_TOOLS = new Set([
   EditTool.Name,
   MemoryTool.Name,
+  SessionHistoryTool.Name,
   ShellTool.Name,
   WRITE_FILE_TOOL_NAME,
   WebFetchTool.Name,
