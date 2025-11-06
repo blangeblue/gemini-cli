@@ -10,6 +10,9 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  DEFAULT_HUNYUAN_MODEL,
+  DEFAULT_HUNYUAN_STANDARD_MODEL,
+  DEFAULT_HUNYUAN_LITE_MODEL,
 } from './models.js';
 
 describe('getEffectiveModel', () => {
@@ -41,6 +44,27 @@ describe('getEffectiveModel', () => {
       const customModel = 'custom-model-v1';
       const model = getEffectiveModel(isInFallbackMode, customModel);
       expect(model).toBe(customModel);
+    });
+
+    it('should return the Hunyuan Pro model when requested', () => {
+      const model = getEffectiveModel(isInFallbackMode, DEFAULT_HUNYUAN_MODEL);
+      expect(model).toBe(DEFAULT_HUNYUAN_MODEL);
+    });
+
+    it('should return the Hunyuan Standard model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_HUNYUAN_STANDARD_MODEL,
+      );
+      expect(model).toBe(DEFAULT_HUNYUAN_STANDARD_MODEL);
+    });
+
+    it('should return the Hunyuan Lite model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_HUNYUAN_LITE_MODEL,
+      );
+      expect(model).toBe(DEFAULT_HUNYUAN_LITE_MODEL);
     });
   });
 
@@ -78,6 +102,27 @@ describe('getEffectiveModel', () => {
       const customModel = 'custom-model-v1-unlisted';
       const model = getEffectiveModel(isInFallbackMode, customModel);
       expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+    });
+
+    it('should fallback the Hunyuan Pro model to Hunyuan Standard model', () => {
+      const model = getEffectiveModel(isInFallbackMode, DEFAULT_HUNYUAN_MODEL);
+      expect(model).toBe(DEFAULT_HUNYUAN_STANDARD_MODEL);
+    });
+
+    it('should honor the Hunyuan Lite model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_HUNYUAN_LITE_MODEL,
+      );
+      expect(model).toBe(DEFAULT_HUNYUAN_LITE_MODEL);
+    });
+
+    it('should return the Hunyuan Standard model when requested', () => {
+      const model = getEffectiveModel(
+        isInFallbackMode,
+        DEFAULT_HUNYUAN_STANDARD_MODEL,
+      );
+      expect(model).toBe(DEFAULT_HUNYUAN_STANDARD_MODEL);
     });
   });
 });

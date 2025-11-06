@@ -51,15 +51,26 @@ import { handleFallback } from '../fallback/handler.js';
 import type { RoutingContext } from '../routing/routingStrategy.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
 
+// 检查指定模型是否支持思考功能
 export function isThinkingSupported(model: string) {
-  return model.startsWith('gemini-2.5') || model === DEFAULT_GEMINI_MODEL_AUTO;
+  return (
+    model.startsWith('gemini-2.5') || // Gemini 2.5 系列模型支持思考
+    model === DEFAULT_GEMINI_MODEL_AUTO || // 自动模型选择支持思考
+    model.startsWith('hunyuan') // 混元模型也支持思考功能（新增）
+  );
 }
 
+// 检查指定模型是否默认启用思考功能
 export function isThinkingDefault(model: string) {
-  if (model.startsWith('gemini-2.5-flash-lite')) {
-    return false;
+  // lite 模型默认不启用思考功能以节省资源
+  if (model.startsWith('gemini-2.5-flash-lite') || model.includes('lite')) {
+    return false; // lite 模型返回 false
   }
-  return model.startsWith('gemini-2.5') || model === DEFAULT_GEMINI_MODEL_AUTO;
+  return (
+    model.startsWith('gemini-2.5') || // Gemini 2.5 系列默认启用思考
+    model === DEFAULT_GEMINI_MODEL_AUTO || // 自动模型默认启用思考
+    model.startsWith('hunyuan') // 混元模型默认启用思考功能（新增）
+  );
 }
 
 /**

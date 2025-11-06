@@ -524,13 +524,14 @@ const SETTINGS_SCHEMA = {
     showInDialog: false,
     properties: {
       name: {
-        type: 'string',
-        label: 'Model',
-        category: 'Model',
-        requiresRestart: false,
-        default: undefined as string | undefined,
-        description: 'The Gemini model to use for conversations.',
-        showInDialog: false,
+        type: 'string', // 字符串类型的设置
+        label: 'Model', // 设置的显示标签
+        category: 'Model', // 设置分类为模型相关
+        requiresRestart: false, // 修改此设置不需要重启应用
+        default: undefined as string | undefined, // 默认值未定义
+        description:
+          'The AI model to use for conversations (supports Gemini and Hunyuan models).', // 用于对话的 AI 模型（支持 Gemini 和混元模型）
+        showInDialog: false, // 不在对话框中显示此设置
       },
       maxSessionTurns: {
         type: 'number',

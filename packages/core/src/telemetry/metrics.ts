@@ -416,9 +416,11 @@ export enum GenAiOperationName {
   GENERATE_CONTENT = 'generate_content',
 }
 
+// 生成式 AI 提供商名称枚举，遵循 OpenTelemetry 约定
 export enum GenAiProviderName {
-  GCP_GEN_AI = 'gcp.gen_ai',
-  GCP_VERTEX_AI = 'gcp.vertex_ai',
+  GCP_GEN_AI = 'gcp.gen_ai', // Google Cloud Platform 生成式 AI 服务
+  GCP_VERTEX_AI = 'gcp.vertex_ai', // Google Cloud Vertex AI 服务
+  TENCENT_HUNYUAN = 'tencent.hunyuan', // 腾讯混元 AI 服务（新增支持）
 }
 
 export enum GenAiTokenType {
@@ -752,17 +754,22 @@ export function getConventionAttributes(event: {
 }
 
 /**
- * Maps authentication type to GenAI provider name following OpenTelemetry conventions
+ * 将认证类型映射到生成式 AI 提供商名称，遵循 OpenTelemetry 约定
+ *
+ * @param authType 认证类型字符串
+ * @returns 对应的生成式 AI 提供商名称
  */
 function getGenAiProvider(authType?: string): GenAiProviderName {
   switch (authType) {
-    case AuthType.USE_VERTEX_AI:
-    case AuthType.CLOUD_SHELL:
-    case AuthType.LOGIN_WITH_GOOGLE:
-      return GenAiProviderName.GCP_VERTEX_AI;
-    case AuthType.USE_GEMINI:
-    default:
-      return GenAiProviderName.GCP_GEN_AI;
+    case AuthType.USE_VERTEX_AI: // Vertex AI 认证
+    case AuthType.CLOUD_SHELL: // Cloud Shell 环境
+    case AuthType.LOGIN_WITH_GOOGLE: // Google OAuth 登录
+      return GenAiProviderName.GCP_VERTEX_AI; // 返回 Google Cloud Vertex AI 提供商
+    case AuthType.USE_HUNYUAN: // 混元 API 密钥认证（新增）
+      return GenAiProviderName.TENCENT_HUNYUAN; // 返回腾讯混元提供商
+    case AuthType.USE_GEMINI: // Gemini API 密钥认证
+    default: // 默认情况
+      return GenAiProviderName.GCP_GEN_AI; // 返回 Google 生成式 AI 提供商
   }
 }
 

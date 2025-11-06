@@ -16,6 +16,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_MODEL,
+  DEFAULT_HUNYUAN_MODEL,
+  DEFAULT_HUNYUAN_LITE_MODEL,
 } from '../../config/models.js';
 import {
   type GenerateContentConfig,
@@ -138,12 +140,40 @@ const ClassifierResponseSchema = z.object({
   model_choice: z.enum([FLASH_MODEL, PRO_MODEL]),
 });
 
+/**
+ * 根据当前配置确定合适的快速和高性能模型。
+ * 这允许分类器从与当前配置模型相同的系列中选择模型。
+ *
+ * @param config 应用程序配置对象
+ * @returns 包含快速模型和高性能模型的对象
+ */
+function getModelMappingForClassifier(config: Config): {
+  fastModel: string; // 快速模型名称
+  proModel: string; // 高性能模型名称
+} {
+  const currentModel = config.getModel(); // 获取当前配置的模型
+
+  // 检查当前模型是否来自混元系列
+  if (currentModel.includes('hunyuan')) {
+    return {
+      fastModel: DEFAULT_HUNYUAN_LITE_MODEL, // 返回混元轻量模型作为快速选项
+      proModel: DEFAULT_HUNYUAN_MODEL, // 返回混元 Pro 模型作为高性能选项
+    };
+  }
+
+  // 默认使用 Gemini 模型系列
+  return {
+    fastModel: DEFAULT_GEMINI_FLASH_MODEL, // 返回 Gemini Flash 作为快速选项
+    proModel: DEFAULT_GEMINI_MODEL, // 返回 Gemini Pro 作为高性能选项
+  };
+}
+
 export class ClassifierStrategy implements RoutingStrategy {
   readonly name = 'classifier';
 
   async route(
     context: RoutingContext,
-    _config: Config,
+    config: Config,
     baseLlmClient: BaseLlmClient,
   ): Promise<RoutingDecision | null> {
     const startTime = Date.now();
@@ -179,27 +209,31 @@ export class ClassifierStrategy implements RoutingStrategy {
         promptId,
       });
 
-      const routerResponse = ClassifierResponseSchema.parse(jsonResponse);
+      const routerResponse = ClassifierResponseSchema.parse(jsonResponse); // 解析分类器的响应
 
-      const reasoning = routerResponse.reasoning;
-      const latencyMs = Date.now() - startTime;
+      const reasoning = routerResponse.reasoning; // 获取分类器的推理过程
+      const latencyMs = Date.now() - startTime; // 计算响应延迟时间
 
+      // 根据当前配置获取合适的模型映射
+      const modelMapping = getModelMappingForClassifier(config);
+
+      // 根据分类器的选择返回相应的模型
       if (routerResponse.model_choice === FLASH_MODEL) {
         return {
-          model: DEFAULT_GEMINI_FLASH_MODEL,
+          model: modelMapping.fastModel, // 使用快速模型（Gemini Flash 或混元 Lite）
           metadata: {
-            source: 'Classifier',
-            latencyMs,
-            reasoning,
+            source: 'Classifier', // 标记决策来源为分类器
+            latencyMs, // 记录延迟时间
+            reasoning, // 记录推理过程
           },
         };
       } else {
         return {
-          model: DEFAULT_GEMINI_MODEL,
+          model: modelMapping.proModel, // 使用高性能模型（Gemini Pro 或混元 Pro）
           metadata: {
-            source: 'Classifier',
-            reasoning,
-            latencyMs,
+            source: 'Classifier', // 标记决策来源为分类器
+            reasoning, // 记录推理过程
+            latencyMs, // 记录延迟时间
           },
         };
       }
