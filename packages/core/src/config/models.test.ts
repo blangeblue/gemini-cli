@@ -10,6 +10,8 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  KIMI_K2_INSTRUCT,
+  KIMI_K2_BASE,
 } from './models.js';
 
 describe('getEffectiveModel', () => {
@@ -41,6 +43,16 @@ describe('getEffectiveModel', () => {
       const customModel = 'custom-model-v1';
       const model = getEffectiveModel(isInFallbackMode, customModel);
       expect(model).toBe(customModel);
+    });
+
+    it('should return Kimi K2 Instruct when requested', () => {
+      const model = getEffectiveModel(isInFallbackMode, KIMI_K2_INSTRUCT);
+      expect(model).toBe(KIMI_K2_INSTRUCT);
+    });
+
+    it('should return Kimi K2 Base when requested', () => {
+      const model = getEffectiveModel(isInFallbackMode, KIMI_K2_BASE);
+      expect(model).toBe(KIMI_K2_BASE);
     });
   });
 
@@ -77,6 +89,11 @@ describe('getEffectiveModel', () => {
     it('should downgrade any other custom model to the Flash model', () => {
       const customModel = 'custom-model-v1-unlisted';
       const model = getEffectiveModel(isInFallbackMode, customModel);
+      expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+    });
+
+    it('should downgrade Kimi K2 models to the Flash model', () => {
+      const model = getEffectiveModel(isInFallbackMode, KIMI_K2_INSTRUCT);
       expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     });
   });
