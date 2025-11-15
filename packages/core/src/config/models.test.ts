@@ -10,6 +10,7 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  DEFAULT_HUNYUAN_MODEL,
 } from './models.js';
 
 describe('getEffectiveModel', () => {
@@ -41,6 +42,11 @@ describe('getEffectiveModel', () => {
       const customModel = 'custom-model-v1';
       const model = getEffectiveModel(isInFallbackMode, customModel);
       expect(model).toBe(customModel);
+    });
+
+    it('should return the Hunyuan model when Hunyuan is requested', () => {
+      const model = getEffectiveModel(isInFallbackMode, DEFAULT_HUNYUAN_MODEL);
+      expect(model).toBe(DEFAULT_HUNYUAN_MODEL);
     });
   });
 
@@ -78,6 +84,11 @@ describe('getEffectiveModel', () => {
       const customModel = 'custom-model-v1-unlisted';
       const model = getEffectiveModel(isInFallbackMode, customModel);
       expect(model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+    });
+
+    it('should honor the Hunyuan model even in fallback mode if it contains "lite"', () => {
+      const model = getEffectiveModel(isInFallbackMode, DEFAULT_HUNYUAN_MODEL);
+      expect(model).toBe(DEFAULT_HUNYUAN_MODEL);
     });
   });
 });
