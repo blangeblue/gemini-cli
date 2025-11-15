@@ -1167,4 +1167,9 @@ export class Config {
   }
 }
 // Export model constants for use in CLI
+export {
+  DEFAULT_HUNYUAN_MODEL,
+  DEFAULT_HUNYUAN_LITE_MODEL,
+  DEFAULT_HUNYUAN_VISION_MODEL,
+} from './models.js';
 export { DEFAULT_GEMINI_FLASH_MODEL };

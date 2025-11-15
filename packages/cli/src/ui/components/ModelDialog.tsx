@@ -12,6 +12,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_MODEL_AUTO,
+  DEFAULT_HUNYUAN_MODEL,
+  DEFAULT_HUNYUAN_LITE_MODEL,
   ModelSlashCommandEvent,
   logModelSlashCommand,
 } from '@google/gemini-cli-core';
@@ -48,6 +50,18 @@ const MODEL_OPTIONS = [
     title: 'Flash-Lite',
     description: 'For simple tasks that need to be done quickly',
     key: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  },
+  {
+    value: DEFAULT_HUNYUAN_MODEL,
+    title: 'Hunyuan Turbo',
+    description: 'Tencent Hunyuan model with 256K context window',
+    key: DEFAULT_HUNYUAN_MODEL,
+  },
+  {
+    value: DEFAULT_HUNYUAN_LITE_MODEL,
+    title: 'Hunyuan Lite',
+    description: 'Fast and efficient Hunyuan model for simple tasks',
+    key: DEFAULT_HUNYUAN_LITE_MODEL,
   },
 ];
 
