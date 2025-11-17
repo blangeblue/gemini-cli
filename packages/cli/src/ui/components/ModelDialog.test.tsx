@@ -11,6 +11,7 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_MODEL_AUTO,
+  KIMI_K2_INSTRUCT,
 } from '@google/gemini-cli-core';
 import { ModelDialog } from './ModelDialog.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -93,11 +94,12 @@ describe('<ModelDialog />', () => {
     expect(mockedSelect).toHaveBeenCalledTimes(1);
 
     const props = mockedSelect.mock.calls[0][0];
-    expect(props.items).toHaveLength(4);
+    expect(props.items).toHaveLength(5);
     expect(props.items[0].value).toBe(DEFAULT_GEMINI_MODEL_AUTO);
     expect(props.items[1].value).toBe(DEFAULT_GEMINI_MODEL);
     expect(props.items[2].value).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     expect(props.items[3].value).toBe(DEFAULT_GEMINI_FLASH_LITE_MODEL);
+    expect(props.items[4].value).toBe(KIMI_K2_INSTRUCT);
     expect(props.showNumbers).toBe(true);
   });
 
@@ -219,5 +221,18 @@ describe('<ModelDialog />', () => {
     // Should be called at least twice: initial render + re-render after context change
     expect(mockedSelect).toHaveBeenCalledTimes(2);
     expect(mockedSelect.mock.calls[1][0].initialIndex).toBe(3);
+  });
+
+  it('initializes with Kimi K2 model when selected', () => {
+    const mockGetModel = vi.fn(() => KIMI_K2_INSTRUCT);
+    renderComponent({}, { getModel: mockGetModel });
+
+    expect(mockGetModel).toHaveBeenCalled();
+    expect(mockedSelect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        initialIndex: 4,
+      }),
+      undefined,
+    );
   });
 });
