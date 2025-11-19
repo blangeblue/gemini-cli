@@ -51,15 +51,28 @@ import { handleFallback } from '../fallback/handler.js';
 import type { RoutingContext } from '../routing/routingStrategy.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
 
+const THINKING_SUPPORTED_PREFIXES = ['gemini-2.5', 'gemini-3.0'];
+const THINKING_DISABLED_PREFIXES = [
+  'gemini-2.5-flash-lite',
+  'gemini-3.0-flash-lite',
+];
+
+function matchesModelPrefixes(model: string, prefixes: string[]): boolean {
+  return prefixes.some((prefix) => model.startsWith(prefix));
+}
+
 export function isThinkingSupported(model: string) {
-  return model.startsWith('gemini-2.5') || model === DEFAULT_GEMINI_MODEL_AUTO;
+  return (
+    matchesModelPrefixes(model, THINKING_SUPPORTED_PREFIXES) ||
+    model === DEFAULT_GEMINI_MODEL_AUTO
+  );
 }
 
 export function isThinkingDefault(model: string) {
-  if (model.startsWith('gemini-2.5-flash-lite')) {
+  if (matchesModelPrefixes(model, THINKING_DISABLED_PREFIXES)) {
     return false;
   }
-  return model.startsWith('gemini-2.5') || model === DEFAULT_GEMINI_MODEL_AUTO;
+  return isThinkingSupported(model);
 }
 
 /**
