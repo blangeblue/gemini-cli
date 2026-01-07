@@ -15,6 +15,7 @@ describe('validateNonInterActiveAuth', () => {
   let originalEnvGeminiApiKey: string | undefined;
   let originalEnvVertexAi: string | undefined;
   let originalEnvGcp: string | undefined;
+  let originalEnvKimiApiKey: string | undefined;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
   let processExitSpy: ReturnType<typeof vi.spyOn>;
   let refreshAuthMock: vi.Mock;
@@ -24,9 +25,11 @@ describe('validateNonInterActiveAuth', () => {
     originalEnvGeminiApiKey = process.env['GEMINI_API_KEY'];
     originalEnvVertexAi = process.env['GOOGLE_GENAI_USE_VERTEXAI'];
     originalEnvGcp = process.env['GOOGLE_GENAI_USE_GCA'];
+    originalEnvKimiApiKey = process.env['KIMI_API_KEY'];
     delete process.env['GEMINI_API_KEY'];
     delete process.env['GOOGLE_GENAI_USE_VERTEXAI'];
     delete process.env['GOOGLE_GENAI_USE_GCA'];
+    delete process.env['KIMI_API_KEY'];
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     processExitSpy = vi.spyOn(process, 'exit').mockImplementation((code) => {
       throw new Error(`process.exit(${code}) called`);
@@ -69,6 +72,11 @@ describe('validateNonInterActiveAuth', () => {
       process.env['GOOGLE_GENAI_USE_GCA'] = originalEnvGcp;
     } else {
       delete process.env['GOOGLE_GENAI_USE_GCA'];
+    }
+    if (originalEnvKimiApiKey !== undefined) {
+      process.env['KIMI_API_KEY'] = originalEnvKimiApiKey;
+    } else {
+      delete process.env['KIMI_API_KEY'];
     }
     vi.restoreAllMocks();
   });
@@ -124,6 +132,20 @@ describe('validateNonInterActiveAuth', () => {
       mockSettings,
     );
     expect(refreshAuthMock).toHaveBeenCalledWith(AuthType.USE_GEMINI);
+  });
+
+  it('uses USE_KIMI if KIMI_API_KEY is set', async () => {
+    process.env['KIMI_API_KEY'] = 'fake-key';
+    const nonInteractiveConfig = {
+      refreshAuth: refreshAuthMock,
+    };
+    await validateNonInteractiveAuth(
+      undefined,
+      undefined,
+      nonInteractiveConfig,
+      mockSettings,
+    );
+    expect(refreshAuthMock).toHaveBeenCalledWith(AuthType.USE_KIMI);
   });
 
   it('uses USE_VERTEX_AI if GOOGLE_GENAI_USE_VERTEXAI is true (with GOOGLE_CLOUD_PROJECT and GOOGLE_CLOUD_LOCATION)', async () => {

@@ -33,19 +33,19 @@ const MODEL_OPTIONS = [
   },
   {
     value: DEFAULT_GEMINI_MODEL,
-    title: 'Pro',
+    title: 'Pro (Gemini 3.0)',
     description: 'For complex tasks that require deep reasoning and creativity',
     key: DEFAULT_GEMINI_MODEL,
   },
   {
     value: DEFAULT_GEMINI_FLASH_MODEL,
-    title: 'Flash',
+    title: 'Flash (Gemini 3.0)',
     description: 'For tasks that need a balance of speed and reasoning',
     key: DEFAULT_GEMINI_FLASH_MODEL,
   },
   {
     value: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-    title: 'Flash-Lite',
+    title: 'Flash-Lite (Gemini 3.0)',
     description: 'For simple tasks that need to be done quickly',
     key: DEFAULT_GEMINI_FLASH_LITE_MODEL,
   },

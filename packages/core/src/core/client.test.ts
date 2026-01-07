@@ -218,6 +218,10 @@ describe('isThinkingSupported', () => {
     expect(isThinkingSupported('gemini-2.5-pro')).toBe(true);
   });
 
+  it('should return true for gemini-3.0-pro', () => {
+    expect(isThinkingSupported('gemini-3.0-pro')).toBe(true);
+  });
+
   it('should return false for other models', () => {
     expect(isThinkingSupported('gemini-1.5-flash')).toBe(false);
     expect(isThinkingSupported('some-other-model')).toBe(false);
@@ -235,6 +239,10 @@ describe('isThinkingDefault', () => {
 
   it('should return true for gemini-2.5-pro', () => {
     expect(isThinkingDefault('gemini-2.5-pro')).toBe(true);
+  });
+
+  it('should return true for gemini-3.0-pro', () => {
+    expect(isThinkingDefault('gemini-3.0-pro')).toBe(true);
   });
 
   it('should return false for other models', () => {
