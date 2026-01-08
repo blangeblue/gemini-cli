@@ -18,8 +18,22 @@ function getAuthTypeFromEnv(): AuthType | undefined {
   if (process.env['GOOGLE_GENAI_USE_VERTEXAI'] === 'true') {
     return AuthType.USE_VERTEX_AI;
   }
+  if (process.env['DEEPSEEK_API_KEY']) {
+    return AuthType.USE_DEEPSEEK;
+  }
   if (process.env['GEMINI_API_KEY']) {
     return AuthType.USE_GEMINI;
+  }
+  return undefined;
+}
+
+function getAuthTypeFromModel(model: string | undefined): AuthType | undefined {
+  if (!model) {
+    return undefined;
+  }
+  // Check if model name contains "deepseek" (case-insensitive)
+  if (model.toLowerCase().includes('deepseek')) {
+    return AuthType.USE_DEEPSEEK;
   }
   return undefined;
 }
@@ -40,11 +54,16 @@ export async function validateNonInteractiveAuth(
       }
     }
 
+    // Try to determine auth type from model name if not explicitly set
+    const modelAuthType = getAuthTypeFromModel(nonInteractiveConfig.getModel());
     const effectiveAuthType =
-      enforcedType || getAuthTypeFromEnv() || configuredAuthType;
+      enforcedType ||
+      getAuthTypeFromEnv() ||
+      modelAuthType ||
+      configuredAuthType;
 
     if (!effectiveAuthType) {
-      const message = `Please set an Auth method in your ${USER_SETTINGS_PATH} or specify one of the following environment variables before running: GEMINI_API_KEY, GOOGLE_GENAI_USE_VERTEXAI, GOOGLE_GENAI_USE_GCA`;
+      const message = `Please set an Auth method in your ${USER_SETTINGS_PATH} or specify one of the following environment variables before running: GEMINI_API_KEY, DEEPSEEK_API_KEY, GOOGLE_GENAI_USE_VERTEXAI, GOOGLE_GENAI_USE_GCA`;
       throw new Error(message);
     }
 
