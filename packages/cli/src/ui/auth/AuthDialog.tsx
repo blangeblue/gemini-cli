@@ -61,6 +61,11 @@ export function AuthDialog({
       value: AuthType.USE_VERTEX_AI,
       key: AuthType.USE_VERTEX_AI,
     },
+    {
+      label: 'Use DeepSeek API Key',
+      value: AuthType.USE_DEEPSEEK,
+      key: AuthType.USE_DEEPSEEK,
+    },
   ];
 
   if (settings.merged.security?.auth?.enforcedType) {
@@ -85,6 +90,10 @@ export function AuthDialog({
 
     if (defaultAuthType) {
       return item.value === defaultAuthType;
+    }
+
+    if (process.env['DEEPSEEK_API_KEY']) {
+      return item.value === AuthType.USE_DEEPSEEK;
     }
 
     if (process.env['GEMINI_API_KEY']) {

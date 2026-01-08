@@ -115,6 +115,12 @@ class GeminiAgent {
         name: 'Vertex AI',
         description: null,
       },
+      {
+        id: AuthType.USE_DEEPSEEK,
+        name: 'Use DeepSeek API key',
+        description:
+          'Requires setting the `DEEPSEEK_API_KEY` environment variable',
+      },
     ];
 
     return {
