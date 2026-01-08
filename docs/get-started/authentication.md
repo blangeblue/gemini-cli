@@ -187,6 +187,50 @@ To avoid setting environment variables in every terminal session, you can:
 
     Variables are loaded from the first file found, not merged.
 
+## Use DeepSeek or Other OpenAI-Compatible APIs
+
+Gemini CLI supports using DeepSeek and other OpenAI-compatible API providers. This allows you to use alternative LLM providers while using the Gemini CLI interface.
+
+### DeepSeek API
+
+To use DeepSeek models:
+
+1.  Obtain your API key from [DeepSeek Platform](https://platform.deepseek.com/).
+2.  Set the required environment variables:
+
+    ```bash
+    # Set your DeepSeek API key
+    export DEEPSEEK_API_KEY="YOUR_DEEPSEEK_API_KEY"
+
+    # Set the DeepSeek API base URL
+    export DEEPSEEK_BASE_URL="https://api.deepseek.com"
+    ```
+
+3.  Launch Gemini CLI and specify a DeepSeek model:
+
+    ```bash
+    gemini -m deepseek-chat
+    ```
+
+To make these settings persistent, see [Persisting Environment Variables](#persisting-environment-variables).
+
+### Custom OpenAI-Compatible APIs
+
+You can also use any OpenAI-compatible API by setting custom environment variables:
+
+```bash
+# For custom API providers, set these variables
+export GEMINI_API_KEY="YOUR_CUSTOM_API_KEY"
+export GEMINI_API_BASE_URL="https://your-custom-api.com/v1"
+
+# Then launch with your model name
+gemini -m your-model-name
+```
+
+> **Note:** When using custom API providers, ensure the API is OpenAI-compatible. Some features may not work as expected if the API has different behavior than Gemini's API.
+
+> **Warning:** Treat API keys as sensitive credentials. Protect them to prevent unauthorized access.
+
 ## Non-interactive mode / headless environments
 
 Non-interative mode / headless environments will use your existing authentication method, if an existing authentication credential is cached.

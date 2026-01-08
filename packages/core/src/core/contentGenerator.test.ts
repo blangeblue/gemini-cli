@@ -104,6 +104,40 @@ describe('createContentGenerator', () => {
       ),
     );
   });
+
+  it('should create a GoogleGenAI content generator with custom baseUrl', async () => {
+    const mockConfig = {
+      getUsageStatisticsEnabled: () => false,
+    } as unknown as Config;
+    const mockGenerator = {
+      models: {},
+    } as unknown as GoogleGenAI;
+    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
+    const generator = await createContentGenerator(
+      {
+        apiKey: 'test-api-key',
+        authType: AuthType.USE_GEMINI,
+        apiBaseUrl: 'https://api.deepseek.com',
+      },
+      mockConfig,
+    );
+    expect(GoogleGenAI).toHaveBeenCalledWith({
+      apiKey: 'test-api-key',
+      vertexai: undefined,
+      httpOptions: {
+        headers: {
+          'User-Agent': expect.any(String),
+        },
+        baseUrl: 'https://api.deepseek.com',
+      },
+    });
+    expect(generator).toEqual(
+      new LoggingContentGenerator(
+        (mockGenerator as GoogleGenAI).models,
+        mockConfig,
+      ),
+    );
+  });
 });
 
 describe('createContentGeneratorConfig', () => {
@@ -176,5 +210,27 @@ describe('createContentGeneratorConfig', () => {
     );
     expect(config.apiKey).toBeUndefined();
     expect(config.vertexai).toBeUndefined();
+  });
+
+  it('should configure for DeepSeek when DEEPSEEK_API_KEY and DEEPSEEK_BASE_URL are set', async () => {
+    vi.stubEnv('DEEPSEEK_API_KEY', 'deepseek-test-key');
+    vi.stubEnv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com');
+    const config = await createContentGeneratorConfig(mockConfig, undefined);
+    expect(config.apiKey).toBe('deepseek-test-key');
+    expect(config.apiBaseUrl).toBe('https://api.deepseek.com');
+    expect(config.vertexai).toBe(false);
+  });
+
+  it('should configure custom base URL when GEMINI_API_BASE_URL is set', async () => {
+    vi.stubEnv('GEMINI_API_BASE_URL', 'https://custom-api.example.com');
+    const config = await createContentGeneratorConfig(mockConfig, undefined);
+    expect(config.apiBaseUrl).toBe('https://custom-api.example.com');
+  });
+
+  it('should prefer GEMINI_API_BASE_URL over DEEPSEEK_BASE_URL', async () => {
+    vi.stubEnv('GEMINI_API_BASE_URL', 'https://custom-api.example.com');
+    vi.stubEnv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com');
+    const config = await createContentGeneratorConfig(mockConfig, undefined);
+    expect(config.apiBaseUrl).toBe('https://custom-api.example.com');
   });
 });
