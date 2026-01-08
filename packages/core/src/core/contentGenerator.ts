@@ -19,6 +19,8 @@ import type { Config } from '../config/config.js';
 import type { UserTierId } from '../code_assist/types.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
 import { InstallationManager } from '../utils/installationManager.js';
+import { DeepSeekContentGenerator } from './deepseekContentGenerator.js';
+import { isDeepSeekModel } from '../config/models.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -46,6 +48,7 @@ export enum AuthType {
   USE_GEMINI = 'gemini-api-key',
   USE_VERTEX_AI = 'vertex-ai',
   CLOUD_SHELL = 'cloud-shell',
+  USE_DEEPSEEK = 'deepseek-api-key',
 }
 
 export type ContentGeneratorConfig = {
@@ -63,21 +66,31 @@ export function createContentGeneratorConfig(
   const googleApiKey = process.env['GOOGLE_API_KEY'] || undefined;
   const googleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'] || undefined;
   const googleCloudLocation = process.env['GOOGLE_CLOUD_LOCATION'] || undefined;
+  const deepseekApiKey = process.env['DEEPSEEK_API_KEY'] || undefined;
+
+  // Auto-detect auth type based on model name if not explicitly provided
+  let effectiveAuthType = authType;
+  if (!effectiveAuthType && config) {
+    const model = config.getModel();
+    if (isDeepSeekModel(model) && deepseekApiKey) {
+      effectiveAuthType = AuthType.USE_DEEPSEEK;
+    }
+  }
 
   const contentGeneratorConfig: ContentGeneratorConfig = {
-    authType,
+    authType: effectiveAuthType,
     proxy: config?.getProxy(),
   };
 
   // If we are using Google auth or we are in Cloud Shell, there is nothing else to validate for now
   if (
-    authType === AuthType.LOGIN_WITH_GOOGLE ||
-    authType === AuthType.CLOUD_SHELL
+    effectiveAuthType === AuthType.LOGIN_WITH_GOOGLE ||
+    effectiveAuthType === AuthType.CLOUD_SHELL
   ) {
     return contentGeneratorConfig;
   }
 
-  if (authType === AuthType.USE_GEMINI && geminiApiKey) {
+  if (effectiveAuthType === AuthType.USE_GEMINI && geminiApiKey) {
     contentGeneratorConfig.apiKey = geminiApiKey;
     contentGeneratorConfig.vertexai = false;
 
@@ -85,11 +98,18 @@ export function createContentGeneratorConfig(
   }
 
   if (
-    authType === AuthType.USE_VERTEX_AI &&
+    effectiveAuthType === AuthType.USE_VERTEX_AI &&
     (googleApiKey || (googleCloudProject && googleCloudLocation))
   ) {
     contentGeneratorConfig.apiKey = googleApiKey;
     contentGeneratorConfig.vertexai = true;
+
+    return contentGeneratorConfig;
+  }
+
+  if (effectiveAuthType === AuthType.USE_DEEPSEEK && deepseekApiKey) {
+    contentGeneratorConfig.apiKey = deepseekApiKey;
+    contentGeneratorConfig.vertexai = false;
 
     return contentGeneratorConfig;
   }
@@ -146,6 +166,14 @@ export async function createContentGenerator(
     });
     return new LoggingContentGenerator(googleGenAI.models, gcConfig);
   }
+
+  if (config.authType === AuthType.USE_DEEPSEEK) {
+    const deepseekGenerator = new DeepSeekContentGenerator(
+      config.apiKey || '',
+    );
+    return new LoggingContentGenerator(deepseekGenerator, gcConfig);
+  }
+
   throw new Error(
     `Error creating contentGenerator: Unsupported authType: ${config.authType}`,
   );
