@@ -10,6 +10,7 @@ import { GeminiPrivacyNotice } from './GeminiPrivacyNotice.js';
 import { CloudPaidPrivacyNotice } from './CloudPaidPrivacyNotice.js';
 import { CloudFreePrivacyNotice } from './CloudFreePrivacyNotice.js';
 import { DeepSeekPrivacyNotice } from './DeepSeekPrivacyNotice.js';
+import { KimiPrivacyNotice } from './KimiPrivacyNotice.js';
 
 interface PrivacyNoticeProps {
   onExit: () => void;
@@ -32,6 +33,8 @@ const PrivacyNoticeText = ({
       return <CloudPaidPrivacyNotice onExit={onExit} />;
     case AuthType.USE_DEEPSEEK:
       return <DeepSeekPrivacyNotice onExit={onExit} />;
+    case AuthType.USE_KIMI:
+      return <KimiPrivacyNotice onExit={onExit} />;
     case AuthType.LOGIN_WITH_GOOGLE:
     default:
       return <CloudFreePrivacyNotice config={config} onExit={onExit} />;

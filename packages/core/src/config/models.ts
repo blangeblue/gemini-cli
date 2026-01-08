@@ -14,6 +14,8 @@ export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
 export const DEFAULT_DEEPSEEK_MODEL = 'deepseek-chat';
 
+export const DEFAULT_KIMI_MODEL = 'moonshot-v1-8k';
+
 // Some thinking models do not default to dynamic thinking which is done by a value of -1
 export const DEFAULT_THINKING_MODE = -1;
 

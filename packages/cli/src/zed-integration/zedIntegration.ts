@@ -121,6 +121,12 @@ class GeminiAgent {
         description:
           'Requires setting the `DEEPSEEK_API_KEY` environment variable',
       },
+      {
+        id: AuthType.USE_KIMI,
+        name: 'Use Kimi API key',
+        description:
+          'Requires setting the `KIMI_API_KEY` environment variable',
+      },
     ];
 
     return {
