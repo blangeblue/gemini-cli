@@ -19,6 +19,8 @@ import type { Config } from '../config/config.js';
 import type { UserTierId } from '../code_assist/types.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
 import { InstallationManager } from '../utils/installationManager.js';
+import { DeepSeekContentGenerator } from './deepseekContentGenerator.js';
+import { KimiContentGenerator } from './kimiContentGenerator.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -46,6 +48,8 @@ export enum AuthType {
   USE_GEMINI = 'gemini-api-key',
   USE_VERTEX_AI = 'vertex-ai',
   CLOUD_SHELL = 'cloud-shell',
+  USE_DEEPSEEK = 'deepseek-api-key',
+  USE_KIMI = 'kimi-api-key',
 }
 
 export type ContentGeneratorConfig = {
@@ -63,6 +67,8 @@ export function createContentGeneratorConfig(
   const googleApiKey = process.env['GOOGLE_API_KEY'] || undefined;
   const googleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'] || undefined;
   const googleCloudLocation = process.env['GOOGLE_CLOUD_LOCATION'] || undefined;
+  const deepseekApiKey = process.env['DEEPSEEK_API_KEY'] || undefined;
+  const kimiApiKey = process.env['KIMI_API_KEY'] || undefined;
 
   const contentGeneratorConfig: ContentGeneratorConfig = {
     authType,
@@ -90,6 +96,20 @@ export function createContentGeneratorConfig(
   ) {
     contentGeneratorConfig.apiKey = googleApiKey;
     contentGeneratorConfig.vertexai = true;
+
+    return contentGeneratorConfig;
+  }
+
+  if (authType === AuthType.USE_DEEPSEEK && deepseekApiKey) {
+    contentGeneratorConfig.apiKey = deepseekApiKey;
+    contentGeneratorConfig.vertexai = false;
+
+    return contentGeneratorConfig;
+  }
+
+  if (authType === AuthType.USE_KIMI && kimiApiKey) {
+    contentGeneratorConfig.apiKey = kimiApiKey;
+    contentGeneratorConfig.vertexai = false;
 
     return contentGeneratorConfig;
   }
@@ -146,6 +166,27 @@ export async function createContentGenerator(
     });
     return new LoggingContentGenerator(googleGenAI.models, gcConfig);
   }
+
+  if (config.authType === AuthType.USE_DEEPSEEK) {
+    const httpOptions = { headers: baseHeaders };
+    const deepseekGenerator = new DeepSeekContentGenerator(
+      config.apiKey || '',
+      httpOptions,
+      config.proxy,
+    );
+    return new LoggingContentGenerator(deepseekGenerator, gcConfig);
+  }
+
+  if (config.authType === AuthType.USE_KIMI) {
+    const httpOptions = { headers: baseHeaders };
+    const kimiGenerator = new KimiContentGenerator(
+      config.apiKey || '',
+      httpOptions,
+      config.proxy,
+    );
+    return new LoggingContentGenerator(kimiGenerator, gcConfig);
+  }
+
   throw new Error(
     `Error creating contentGenerator: Unsupported authType: ${config.authType}`,
   );
