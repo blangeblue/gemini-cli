@@ -22,6 +22,7 @@ describe('validateAuthMethod', () => {
     vi.stubEnv('GOOGLE_CLOUD_PROJECT', undefined);
     vi.stubEnv('GOOGLE_CLOUD_LOCATION', undefined);
     vi.stubEnv('GOOGLE_API_KEY', undefined);
+    vi.stubEnv('DEEPSEEK_API_KEY', undefined);
   });
 
   afterEach(() => {
@@ -70,6 +71,20 @@ describe('validateAuthMethod', () => {
           '• GOOGLE_CLOUD_PROJECT and GOOGLE_CLOUD_LOCATION environment variables.\n' +
           '• GOOGLE_API_KEY environment variable (if using express mode).\n' +
           'Update your environment and try again (no reload needed if using .env)!',
+      );
+    });
+  });
+
+  describe('USE_DEEPSEEK', () => {
+    it('should return null if DEEPSEEK_API_KEY is set', () => {
+      vi.stubEnv('DEEPSEEK_API_KEY', 'test-key');
+      expect(validateAuthMethod(AuthType.USE_DEEPSEEK)).toBeNull();
+    });
+
+    it('should return an error message if DEEPSEEK_API_KEY is not set', () => {
+      vi.stubEnv('DEEPSEEK_API_KEY', undefined);
+      expect(validateAuthMethod(AuthType.USE_DEEPSEEK)).toBe(
+        'DEEPSEEK_API_KEY environment variable not found. Add that to your environment and try again (no reload needed if using .env)!',
       );
     });
   });
