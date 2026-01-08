@@ -104,6 +104,40 @@ describe('createContentGenerator', () => {
       ),
     );
   });
+
+  it('should create a GoogleGenAI content generator with custom base URL', async () => {
+    const mockConfig = {
+      getUsageStatisticsEnabled: () => false,
+    } as unknown as Config;
+    const mockGenerator = {
+      models: {},
+    } as unknown as GoogleGenAI;
+    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
+    const generator = await createContentGenerator(
+      {
+        apiKey: 'test-api-key',
+        authType: AuthType.USE_GEMINI,
+        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      },
+      mockConfig,
+    );
+    expect(GoogleGenAI).toHaveBeenCalledWith({
+      apiKey: 'test-api-key',
+      vertexai: undefined,
+      httpOptions: {
+        headers: {
+          'User-Agent': expect.any(String),
+        },
+        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      },
+    });
+    expect(generator).toEqual(
+      new LoggingContentGenerator(
+        (mockGenerator as GoogleGenAI).models,
+        mockConfig,
+      ),
+    );
+  });
 });
 
 describe('createContentGeneratorConfig', () => {
@@ -112,6 +146,7 @@ describe('createContentGeneratorConfig', () => {
     setModel: vi.fn(),
     flashFallbackHandler: vi.fn(),
     getProxy: vi.fn(),
+    getModelApiBaseUrl: vi.fn(),
   } as unknown as Config;
 
   beforeEach(() => {
@@ -176,5 +211,27 @@ describe('createContentGeneratorConfig', () => {
     );
     expect(config.apiKey).toBeUndefined();
     expect(config.vertexai).toBeUndefined();
+  });
+
+  it('should include custom base URL when provided', async () => {
+    const mockConfigWithBaseUrl = {
+      getModel: vi.fn().mockReturnValue('qwen-max'),
+      setModel: vi.fn(),
+      flashFallbackHandler: vi.fn(),
+      getProxy: vi.fn(),
+      getModelApiBaseUrl: vi
+        .fn()
+        .mockReturnValue('https://dashscope.aliyuncs.com/compatible-mode/v1'),
+    } as unknown as Config;
+
+    vi.stubEnv('GEMINI_API_KEY', 'test-qwen-key');
+    const config = await createContentGeneratorConfig(
+      mockConfigWithBaseUrl,
+      AuthType.USE_GEMINI,
+    );
+    expect(config.baseUrl).toBe(
+      'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    );
+    expect(config.apiKey).toBe('test-qwen-key');
   });
 });
