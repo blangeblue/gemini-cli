@@ -149,6 +149,11 @@ Settings are organized into categories. All settings should be placed within the
   - **Description:** The Gemini model to use for conversations.
   - **Default:** `undefined`
 
+- **`model.apiBaseUrl`** (string):
+  - **Description:** Custom API base URL for alternative model providers (e.g., Qwen, DeepSeek). When set, allows using models from providers that offer OpenAI-compatible APIs. Use this setting to connect to models like `qwen-max`, `deepseek-chat`, or other compatible endpoints.
+  - **Default:** `undefined`
+  - **Example:** `"https://dashscope.aliyuncs.com/compatible-mode/v1"` for Qwen, or `"https://api.deepseek.com/v1"` for DeepSeek
+
 - **`model.maxSessionTurns`** (number):
   - **Description:** Maximum number of user/model/tool turns to keep in a session. -1 means unlimited.
   - **Default:** `-1`
@@ -603,6 +608,85 @@ This example demonstrates how you can provide general project context, specific 
   - See the [Commands documentation](../cli/commands.md#memory) for full details on the `/memory` command and its sub-commands (`show` and `refresh`).
 
 By understanding and utilizing these configuration layers and the hierarchical nature of context files, you can effectively manage the AI's memory and tailor the Gemini CLI's responses to your specific needs and projects.
+
+## Using Alternative Model Providers (Qwen, DeepSeek, etc.)
+
+Gemini CLI supports using alternative AI model providers that offer OpenAI-compatible APIs, such as Qwen (Alibaba) and DeepSeek. This is done by configuring a custom API base URL and providing the appropriate API key.
+
+### Configuration Steps
+
+1. **Set the API Base URL** in your `~/.gemini/settings.json` or project-level `.gemini/settings.json`:
+
+```json
+{
+  "model": {
+    "name": "qwen-max",
+    "apiBaseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  }
+}
+```
+
+2. **Set the API Key** using environment variables:
+
+For Qwen:
+
+```bash
+export GEMINI_API_KEY="your-qwen-api-key"
+gemini
+```
+
+For DeepSeek:
+
+```bash
+export GEMINI_API_KEY="your-deepseek-api-key"
+gemini
+```
+
+### Example Configurations
+
+#### Qwen (Alibaba Cloud)
+
+```json
+{
+  "model": {
+    "name": "qwen-max",
+    "apiBaseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  }
+}
+```
+
+Available Qwen models:
+
+- `qwen-max` - Most capable model
+- `qwen-plus` - Balanced performance
+- `qwen-turbo` - Fast and efficient
+
+Get your API key from: https://dashscope.aliyuncs.com/
+
+#### DeepSeek
+
+```json
+{
+  "model": {
+    "name": "deepseek-chat",
+    "apiBaseUrl": "https://api.deepseek.com/v1"
+  }
+}
+```
+
+Available DeepSeek models:
+
+- `deepseek-chat` - General purpose chat model
+- `deepseek-coder` - Specialized for coding tasks
+
+Get your API key from: https://platform.deepseek.com/
+
+### Notes
+
+- The `GEMINI_API_KEY` environment variable is used for all alternative providers
+- Make sure your API key has sufficient quota with the provider
+- Not all Gemini CLI features may work with alternative providers, as they depend on provider-specific capabilities
+- Function calling (tool use) support varies by provider
 
 ## Sandboxing
 

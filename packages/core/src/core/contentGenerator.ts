@@ -53,6 +53,7 @@ export type ContentGeneratorConfig = {
   vertexai?: boolean;
   authType?: AuthType;
   proxy?: string;
+  baseUrl?: string;
 };
 
 export function createContentGeneratorConfig(
@@ -67,6 +68,7 @@ export function createContentGeneratorConfig(
   const contentGeneratorConfig: ContentGeneratorConfig = {
     authType,
     proxy: config?.getProxy(),
+    baseUrl: config?.getModelApiBaseUrl(),
   };
 
   // If we are using Google auth or we are in Cloud Shell, there is nothing else to validate for now
@@ -137,7 +139,10 @@ export async function createContentGenerator(
         'x-gemini-api-privileged-user-id': `${installationId}`,
       };
     }
-    const httpOptions = { headers };
+    const httpOptions = {
+      headers,
+      ...(config.baseUrl && { baseUrl: config.baseUrl }),
+    };
 
     const googleGenAI = new GoogleGenAI({
       apiKey: config.apiKey === '' ? undefined : config.apiKey,
