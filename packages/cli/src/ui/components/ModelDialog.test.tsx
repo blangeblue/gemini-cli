@@ -11,6 +11,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_MODEL_AUTO,
+  DEFAULT_DEEPSEEK_MODEL,
+  DEFAULT_DEEPSEEK_CODER_MODEL,
 } from '@google/gemini-cli-core';
 import { ModelDialog } from './ModelDialog.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -93,11 +95,13 @@ describe('<ModelDialog />', () => {
     expect(mockedSelect).toHaveBeenCalledTimes(1);
 
     const props = mockedSelect.mock.calls[0][0];
-    expect(props.items).toHaveLength(4);
+    expect(props.items).toHaveLength(6);
     expect(props.items[0].value).toBe(DEFAULT_GEMINI_MODEL_AUTO);
     expect(props.items[1].value).toBe(DEFAULT_GEMINI_MODEL);
     expect(props.items[2].value).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     expect(props.items[3].value).toBe(DEFAULT_GEMINI_FLASH_LITE_MODEL);
+    expect(props.items[4].value).toBe(DEFAULT_DEEPSEEK_MODEL);
+    expect(props.items[5].value).toBe(DEFAULT_DEEPSEEK_CODER_MODEL);
     expect(props.showNumbers).toBe(true);
   });
 
