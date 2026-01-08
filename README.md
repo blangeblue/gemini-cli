@@ -189,6 +189,17 @@ gemini --include-directories ../lib,../docs
 gemini -m gemini-2.5-flash
 ```
 
+#### Use DeepSeek models
+
+```bash
+# Set up DeepSeek API credentials
+export DEEPSEEK_API_KEY="your-deepseek-api-key"
+export DEEPSEEK_BASE_URL="https://api.deepseek.com"
+
+# Use DeepSeek models
+gemini -m deepseek-chat
+```
+
 #### Non-interactive mode for scripts
 
 Get a simple text response:

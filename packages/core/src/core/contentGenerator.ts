@@ -11,6 +11,7 @@ import type {
   CountTokensParameters,
   EmbedContentResponse,
   EmbedContentParameters,
+  HttpOptions,
 } from '@google/genai';
 import { GoogleGenAI } from '@google/genai';
 import { createCodeAssistContentGenerator } from '../code_assist/codeAssist.js';
@@ -53,6 +54,7 @@ export type ContentGeneratorConfig = {
   vertexai?: boolean;
   authType?: AuthType;
   proxy?: string;
+  apiBaseUrl?: string;
 };
 
 export function createContentGeneratorConfig(
@@ -63,10 +65,14 @@ export function createContentGeneratorConfig(
   const googleApiKey = process.env['GOOGLE_API_KEY'] || undefined;
   const googleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'] || undefined;
   const googleCloudLocation = process.env['GOOGLE_CLOUD_LOCATION'] || undefined;
+  const deepseekApiKey = process.env['DEEPSEEK_API_KEY'] || undefined;
+  const deepseekBaseUrl = process.env['DEEPSEEK_BASE_URL'] || undefined;
+  const customApiBaseUrl = process.env['GEMINI_API_BASE_URL'] || undefined;
 
   const contentGeneratorConfig: ContentGeneratorConfig = {
     authType,
     proxy: config?.getProxy(),
+    apiBaseUrl: customApiBaseUrl || deepseekBaseUrl,
   };
 
   // If we are using Google auth or we are in Cloud Shell, there is nothing else to validate for now
@@ -81,6 +87,20 @@ export function createContentGeneratorConfig(
     contentGeneratorConfig.apiKey = geminiApiKey;
     contentGeneratorConfig.vertexai = false;
 
+    return contentGeneratorConfig;
+  }
+
+  // Support DeepSeek API as a fallback when:
+  // 1. authType is USE_GEMINI (but GEMINI_API_KEY is not set), or
+  // 2. authType is undefined (user hasn't specified an auth method)
+  // This allows using DeepSeek as an alternative to Gemini API
+  if (
+    deepseekApiKey &&
+    deepseekBaseUrl &&
+    (authType === AuthType.USE_GEMINI || authType === undefined)
+  ) {
+    contentGeneratorConfig.apiKey = deepseekApiKey;
+    contentGeneratorConfig.vertexai = false;
     return contentGeneratorConfig;
   }
 
@@ -137,7 +157,14 @@ export async function createContentGenerator(
         'x-gemini-api-privileged-user-id': `${installationId}`,
       };
     }
-    const httpOptions = { headers };
+    const httpOptions: HttpOptions = {
+      headers,
+    };
+
+    // Add custom base URL if provided (e.g., for DeepSeek API)
+    if (config.apiBaseUrl) {
+      httpOptions.baseUrl = config.apiBaseUrl;
+    }
 
     const googleGenAI = new GoogleGenAI({
       apiKey: config.apiKey === '' ? undefined : config.apiKey,
