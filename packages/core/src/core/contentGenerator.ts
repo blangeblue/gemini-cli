@@ -11,6 +11,7 @@ import type {
   CountTokensParameters,
   EmbedContentResponse,
   EmbedContentParameters,
+  HttpOptions,
 } from '@google/genai';
 import { GoogleGenAI } from '@google/genai';
 import { createCodeAssistContentGenerator } from '../code_assist/codeAssist.js';
@@ -89,9 +90,10 @@ export function createContentGeneratorConfig(
     return contentGeneratorConfig;
   }
 
-  // Support DeepSeek API when authType is USE_GEMINI or not specified
+  // Support DeepSeek API as a fallback when:
+  // 1. authType is USE_GEMINI (but GEMINI_API_KEY is not set), or
+  // 2. authType is undefined (user hasn't specified an auth method)
   // This allows using DeepSeek as an alternative to Gemini API
-  // Only used if GEMINI_API_KEY is not set
   if (
     deepseekApiKey &&
     deepseekBaseUrl &&
@@ -155,7 +157,7 @@ export async function createContentGenerator(
         'x-gemini-api-privileged-user-id': `${installationId}`,
       };
     }
-    const httpOptions: { headers: Record<string, string>; baseUrl?: string } = {
+    const httpOptions: HttpOptions = {
       headers,
     };
 
