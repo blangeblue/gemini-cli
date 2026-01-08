@@ -259,6 +259,7 @@ gemini
 - [**Enterprise Guide**](./docs/cli/enterprise.md) - Deploy and manage in a corporate environment.
 - [**Telemetry & Monitoring**](./docs/cli/telemetry.md) - Usage tracking.
 - [**Tools API Development**](./docs/core/tools-api.md) - Create custom tools.
+- [**Alternative Model Providers**](./docs/examples/alternative-models.md) - Use Qwen, DeepSeek, and other OpenAI-compatible models.
 
 ### Troubleshooting & Support
 
