@@ -12,6 +12,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_MODEL_AUTO,
+  DEFAULT_DEEPSEEK_MODEL,
+  DEFAULT_DEEPSEEK_CODER_MODEL,
   ModelSlashCommandEvent,
   logModelSlashCommand,
 } from '@google/gemini-cli-core';
@@ -48,6 +50,18 @@ const MODEL_OPTIONS = [
     title: 'Flash-Lite',
     description: 'For simple tasks that need to be done quickly',
     key: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  },
+  {
+    value: DEFAULT_DEEPSEEK_MODEL,
+    title: 'DeepSeek Chat',
+    description: 'DeepSeek Chat model for general purpose tasks',
+    key: DEFAULT_DEEPSEEK_MODEL,
+  },
+  {
+    value: DEFAULT_DEEPSEEK_CODER_MODEL,
+    title: 'DeepSeek Coder',
+    description: 'DeepSeek Coder model optimized for coding tasks',
+    key: DEFAULT_DEEPSEEK_CODER_MODEL,
   },
 ];
 

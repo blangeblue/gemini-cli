@@ -12,6 +12,10 @@ export const DEFAULT_GEMINI_MODEL_AUTO = 'auto';
 
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
+// DeepSeek models
+export const DEFAULT_DEEPSEEK_MODEL = 'deepseek-chat';
+export const DEFAULT_DEEPSEEK_CODER_MODEL = 'deepseek-coder';
+
 // Some thinking models do not default to dynamic thinking which is done by a value of -1
 export const DEFAULT_THINKING_MODE = -1;
 
