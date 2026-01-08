@@ -221,6 +221,43 @@ describe('createContentGeneratorConfig', () => {
     expect(config.vertexai).toBe(false);
   });
 
+  it('should configure for DeepSeek when authType is USE_GEMINI', async () => {
+    vi.stubEnv('DEEPSEEK_API_KEY', 'deepseek-test-key');
+    vi.stubEnv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com');
+    const config = await createContentGeneratorConfig(
+      mockConfig,
+      AuthType.USE_GEMINI,
+    );
+    expect(config.apiKey).toBe('deepseek-test-key');
+    expect(config.apiBaseUrl).toBe('https://api.deepseek.com');
+    expect(config.vertexai).toBe(false);
+  });
+
+  it('should NOT use DeepSeek when authType is USE_VERTEX_AI', async () => {
+    vi.stubEnv('DEEPSEEK_API_KEY', 'deepseek-test-key');
+    vi.stubEnv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com');
+    vi.stubEnv('GOOGLE_API_KEY', 'vertex-api-key');
+    const config = await createContentGeneratorConfig(
+      mockConfig,
+      AuthType.USE_VERTEX_AI,
+    );
+    // Should use Vertex AI, not DeepSeek
+    expect(config.apiKey).toBe('vertex-api-key');
+    expect(config.vertexai).toBe(true);
+  });
+
+  it('should prefer GEMINI_API_KEY over DEEPSEEK_API_KEY when both are set', async () => {
+    vi.stubEnv('GEMINI_API_KEY', 'gemini-key');
+    vi.stubEnv('DEEPSEEK_API_KEY', 'deepseek-key');
+    vi.stubEnv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com');
+    const config = await createContentGeneratorConfig(
+      mockConfig,
+      AuthType.USE_GEMINI,
+    );
+    expect(config.apiKey).toBe('gemini-key');
+    expect(config.vertexai).toBe(false);
+  });
+
   it('should configure custom base URL when GEMINI_API_BASE_URL is set', async () => {
     vi.stubEnv('GEMINI_API_BASE_URL', 'https://custom-api.example.com');
     const config = await createContentGeneratorConfig(mockConfig, undefined);

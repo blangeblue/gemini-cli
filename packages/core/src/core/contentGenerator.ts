@@ -82,17 +82,23 @@ export function createContentGeneratorConfig(
     return contentGeneratorConfig;
   }
 
-  // Support DeepSeek API
-  if (deepseekApiKey && deepseekBaseUrl) {
-    contentGeneratorConfig.apiKey = deepseekApiKey;
-    contentGeneratorConfig.vertexai = false;
-    return contentGeneratorConfig;
-  }
-
   if (authType === AuthType.USE_GEMINI && geminiApiKey) {
     contentGeneratorConfig.apiKey = geminiApiKey;
     contentGeneratorConfig.vertexai = false;
 
+    return contentGeneratorConfig;
+  }
+
+  // Support DeepSeek API when authType is USE_GEMINI or not specified
+  // This allows using DeepSeek as an alternative to Gemini API
+  // Only used if GEMINI_API_KEY is not set
+  if (
+    deepseekApiKey &&
+    deepseekBaseUrl &&
+    (authType === AuthType.USE_GEMINI || authType === undefined)
+  ) {
+    contentGeneratorConfig.apiKey = deepseekApiKey;
+    contentGeneratorConfig.vertexai = false;
     return contentGeneratorConfig;
   }
 
