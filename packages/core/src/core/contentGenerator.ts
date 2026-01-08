@@ -19,6 +19,7 @@ import type { Config } from '../config/config.js';
 import type { UserTierId } from '../code_assist/types.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
 import { InstallationManager } from '../utils/installationManager.js';
+import { DeepSeekContentGenerator } from './deepseekContentGenerator.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -46,6 +47,7 @@ export enum AuthType {
   USE_GEMINI = 'gemini-api-key',
   USE_VERTEX_AI = 'vertex-ai',
   CLOUD_SHELL = 'cloud-shell',
+  USE_DEEPSEEK = 'deepseek-api-key',
 }
 
 export type ContentGeneratorConfig = {
@@ -63,6 +65,7 @@ export function createContentGeneratorConfig(
   const googleApiKey = process.env['GOOGLE_API_KEY'] || undefined;
   const googleCloudProject = process.env['GOOGLE_CLOUD_PROJECT'] || undefined;
   const googleCloudLocation = process.env['GOOGLE_CLOUD_LOCATION'] || undefined;
+  const deepseekApiKey = process.env['DEEPSEEK_API_KEY'] || undefined;
 
   const contentGeneratorConfig: ContentGeneratorConfig = {
     authType,
@@ -90,6 +93,13 @@ export function createContentGeneratorConfig(
   ) {
     contentGeneratorConfig.apiKey = googleApiKey;
     contentGeneratorConfig.vertexai = true;
+
+    return contentGeneratorConfig;
+  }
+
+  if (authType === AuthType.USE_DEEPSEEK && deepseekApiKey) {
+    contentGeneratorConfig.apiKey = deepseekApiKey;
+    contentGeneratorConfig.vertexai = false;
 
     return contentGeneratorConfig;
   }
@@ -146,6 +156,22 @@ export async function createContentGenerator(
     });
     return new LoggingContentGenerator(googleGenAI.models, gcConfig);
   }
+
+  if (config.authType === AuthType.USE_DEEPSEEK) {
+    const deepseekApiKey = config.apiKey || '';
+    if (!deepseekApiKey) {
+      throw new Error('DEEPSEEK_API_KEY environment variable is required');
+    }
+    const deepseekBaseUrl =
+      process.env['DEEPSEEK_API_BASE_URL'] || undefined;
+    const deepseekGenerator = new DeepSeekContentGenerator(
+      deepseekApiKey,
+      deepseekBaseUrl,
+      config.proxy,
+    );
+    return new LoggingContentGenerator(deepseekGenerator, gcConfig);
+  }
+
   throw new Error(
     `Error creating contentGenerator: Unsupported authType: ${config.authType}`,
   );
