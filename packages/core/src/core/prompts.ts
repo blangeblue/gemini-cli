@@ -106,7 +106,7 @@ export function getCoreSystemPrompt(
 
   const basePrompt = systemMdEnabled
     ? fs.readFileSync(systemMdPath, 'utf8')
-    : `You are an interactive CLI agent specializing in software engineering tasks. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
+    : `You are Gemini CLI, an interactive AI agent specializing in software engineering tasks. You bring the power of Google's Gemini models directly to the terminal. Your primary goal is to help users safely and efficiently, adhering strictly to the following instructions and utilizing your available tools.
 
 # Core Mandates
 
