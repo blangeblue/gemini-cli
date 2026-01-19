@@ -12,6 +12,12 @@ export const DEFAULT_GEMINI_MODEL_AUTO = 'auto';
 
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
+// Qwen models available in Vertex AI Model Garden
+export const QWEN3_NEXT_80B_INSTRUCT =
+  'publishers/qwen/models/qwen3-next-80b-instruct';
+export const QWEN3_NEXT_80B_THINKING =
+  'publishers/qwen/models/qwen3-next-80b-thinking';
+
 // Some thinking models do not default to dynamic thinking which is done by a value of -1
 export const DEFAULT_THINKING_MODE = -1;
 

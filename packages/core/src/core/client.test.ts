@@ -218,9 +218,19 @@ describe('isThinkingSupported', () => {
     expect(isThinkingSupported('gemini-2.5-pro')).toBe(true);
   });
 
+  it('should return true for models with "thinking" in the name', () => {
+    expect(
+      isThinkingSupported('publishers/qwen/models/qwen3-next-80b-thinking'),
+    ).toBe(true);
+    expect(isThinkingSupported('some-model-thinking')).toBe(true);
+  });
+
   it('should return false for other models', () => {
     expect(isThinkingSupported('gemini-1.5-flash')).toBe(false);
     expect(isThinkingSupported('some-other-model')).toBe(false);
+    expect(
+      isThinkingSupported('publishers/qwen/models/qwen3-next-80b-instruct'),
+    ).toBe(false);
   });
 });
 
@@ -237,9 +247,19 @@ describe('isThinkingDefault', () => {
     expect(isThinkingDefault('gemini-2.5-pro')).toBe(true);
   });
 
+  it('should return true for models with "thinking" in the name', () => {
+    expect(
+      isThinkingDefault('publishers/qwen/models/qwen3-next-80b-thinking'),
+    ).toBe(true);
+    expect(isThinkingDefault('some-model-thinking')).toBe(true);
+  });
+
   it('should return false for other models', () => {
     expect(isThinkingDefault('gemini-1.5-flash')).toBe(false);
     expect(isThinkingDefault('some-other-model')).toBe(false);
+    expect(
+      isThinkingDefault('publishers/qwen/models/qwen3-next-80b-instruct'),
+    ).toBe(false);
   });
 });
 

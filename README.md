@@ -189,6 +189,18 @@ gemini --include-directories ../lib,../docs
 gemini -m gemini-2.5-flash
 ```
 
+#### Use Qwen models (Vertex AI Model Garden)
+
+```bash
+# Qwen3-Next 80B Instruct model
+gemini -m publishers/qwen/models/qwen3-next-80b-instruct
+
+# Qwen3-Next 80B Thinking model
+gemini -m publishers/qwen/models/qwen3-next-80b-thinking
+```
+
+**Note:** Qwen models are available through [Vertex AI Model Garden](https://cloud.google.com/vertex-ai/generative-ai/docs/maas/qwen) and require Vertex AI authentication. See the [Vertex AI authentication](#option-3-vertex-ai) section for setup.
+
 #### Non-interactive mode for scripts
 
 Get a simple text response:

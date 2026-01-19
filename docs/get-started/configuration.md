@@ -146,8 +146,16 @@ Settings are organized into categories. All settings should be placed within the
 #### `model`
 
 - **`model.name`** (string):
-  - **Description:** The Gemini model to use for conversations.
+  - **Description:** The model to use for conversations. Supports Gemini models and Qwen models from Vertex AI Model Garden.
   - **Default:** `undefined`
+  - **Gemini Models:**
+    - `gemini-2.5-pro` - For complex tasks requiring deep reasoning
+    - `gemini-2.5-flash` - Balanced speed and reasoning
+    - `gemini-2.5-flash-lite` - Fast responses for simple tasks
+  - **Qwen Models (Vertex AI):**
+    - `publishers/qwen/models/qwen3-next-80b-instruct` - Instruction-following model
+    - `publishers/qwen/models/qwen3-next-80b-thinking` - Deep reasoning model
+  - **Note:** Qwen models require Vertex AI authentication.
 
 - **`model.maxSessionTurns`** (number):
   - **Description:** Maximum number of user/model/tool turns to keep in a session. -1 means unlimited.
@@ -473,8 +481,10 @@ The CLI automatically loads environment variables from an `.env` file. The loadi
 Arguments passed directly when running the CLI can override other configurations for that specific session.
 
 - **`--model <model_name>`** (**`-m <model_name>`**):
-  - Specifies the Gemini model to use for this session.
-  - Example: `npm start -- --model gemini-1.5-pro-latest`
+  - Specifies the model to use for this session (Gemini or Qwen models).
+  - Gemini examples: `gemini -m gemini-2.5-pro`, `gemini -m gemini-2.5-flash`
+  - Qwen examples: `gemini -m publishers/qwen/models/qwen3-next-80b-instruct`
+  - Note: Qwen models require Vertex AI authentication.
 - **`--prompt <your_prompt>`** (**`-p <your_prompt>`**):
   - Used to pass a prompt directly to the command. This invokes Gemini CLI in a non-interactive mode.
   - For scripting examples, use the `--output-format json` flag to get structured output.
