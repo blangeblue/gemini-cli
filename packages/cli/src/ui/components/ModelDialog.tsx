@@ -12,6 +12,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_MODEL_AUTO,
+  QWEN3_NEXT_80B_INSTRUCT,
+  QWEN3_NEXT_80B_THINKING,
   ModelSlashCommandEvent,
   logModelSlashCommand,
 } from '@google/gemini-cli-core';
@@ -33,21 +35,33 @@ const MODEL_OPTIONS = [
   },
   {
     value: DEFAULT_GEMINI_MODEL,
-    title: 'Pro',
+    title: 'Gemini Pro',
     description: 'For complex tasks that require deep reasoning and creativity',
     key: DEFAULT_GEMINI_MODEL,
   },
   {
     value: DEFAULT_GEMINI_FLASH_MODEL,
-    title: 'Flash',
+    title: 'Gemini Flash',
     description: 'For tasks that need a balance of speed and reasoning',
     key: DEFAULT_GEMINI_FLASH_MODEL,
   },
   {
     value: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-    title: 'Flash-Lite',
+    title: 'Gemini Flash-Lite',
     description: 'For simple tasks that need to be done quickly',
     key: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  },
+  {
+    value: QWEN3_NEXT_80B_INSTRUCT,
+    title: 'Qwen3-Next 80B Instruct',
+    description: 'Alibaba Qwen model for instruction-following (Vertex AI)',
+    key: QWEN3_NEXT_80B_INSTRUCT,
+  },
+  {
+    value: QWEN3_NEXT_80B_THINKING,
+    title: 'Qwen3-Next 80B Thinking',
+    description: 'Alibaba Qwen model for deep reasoning tasks (Vertex AI)',
+    key: QWEN3_NEXT_80B_THINKING,
   },
 ];
 
@@ -104,7 +118,10 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       </Box>
       <Box flexDirection="column">
         <Text color={theme.text.secondary}>
-          {'> To use a specific Gemini model, use the --model flag.'}
+          {'> To use any Gemini or Qwen model, use the --model flag.'}
+        </Text>
+        <Text color={theme.text.secondary}>
+          {'> Qwen models require Vertex AI authentication.'}
         </Text>
       </Box>
       <Box marginTop={1} flexDirection="column">
