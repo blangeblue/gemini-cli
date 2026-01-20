@@ -290,6 +290,11 @@ Settings are organized into categories. All settings should be placed within the
   - **Description:** Configuration for the bug report command.
   - **Default:** `undefined`
 
+- **`advanced.startupCommands`** (array of strings):
+  - **Description:** Commands to execute when the CLI starts up. These commands are run after settings are loaded but before the interactive UI starts. Each command has a 30-second timeout and failures are logged but do not prevent the CLI from starting.
+  - **Default:** `[]`
+  - **Example:** `["echo 'CLI starting'", "git fetch --quiet"]`
+
 #### `mcpServers`
 
 Configures connections to one or more Model-Context Protocol (MCP) servers for discovering and using custom tools. Gemini CLI attempts to connect to each configured MCP server to discover available tools. If multiple MCP servers expose a tool with the same name, the tool names will be prefixed with the server alias you defined in the configuration (e.g., `serverAlias__actualToolName`) to avoid conflicts. Note that the system might strip certain schema properties from MCP tool definitions for compatibility. At least one of `command`, `url`, or `httpUrl` must be provided. If multiple are specified, the order of precedence is `httpUrl`, then `url`, then `command`.
