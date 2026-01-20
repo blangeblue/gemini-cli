@@ -532,6 +532,16 @@ const SETTINGS_SCHEMA = {
         description: 'The Gemini model to use for conversations.',
         showInDialog: false,
       },
+      apiBaseUrl: {
+        type: 'string',
+        label: 'API Base URL',
+        category: 'Model',
+        requiresRestart: true,
+        default: undefined as string | undefined,
+        description:
+          'Custom API base URL for alternative model providers (e.g., Qwen, DeepSeek). When set, allows using models from providers that offer OpenAI-compatible APIs.',
+        showInDialog: false,
+      },
       maxSessionTurns: {
         type: 'number',
         label: 'Max Session Turns',
